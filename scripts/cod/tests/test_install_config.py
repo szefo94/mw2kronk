@@ -367,9 +367,13 @@ def test_depots_are_found_where_download_depot_writes_them(tmp_path):
     find_install, find_depot, root = fake_steam(tmp_path)
     assert find_depot(42680, 42683) == str(root / "ubuntu12_32" / "steamapps" / "content" / "app_42680" / "depot_42683")
     assert find_depot(42690, 42698) is None
-    # Windows and macOS clients write them into the library's own steamapps/content.
+    # Windows clients write them into the library's own steamapps/content.
     touch(root / "steamapps" / "content" / "app_42690" / "depot_42698" / "zone" / "dlc" / "mp_moab.ff")
     assert find_depot(42690, 42698) == str(root / "steamapps" / "content" / "app_42690" / "depot_42698")
+    # The macOS client writes them inside its own app bundle under the Steam root.
+    bundle = root / "Steam.AppBundle" / "Steam" / "Contents" / "MacOS" / "steamapps" / "content"
+    touch(bundle / "app_10180" / "depot_10183" / "zone" / "english" / "mp_rust.ff")
+    assert find_depot(10180, 10183) == str(bundle / "app_10180" / "depot_10183")
 
 
 def picked(tmp_path, use, **kw):

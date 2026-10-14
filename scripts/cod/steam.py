@@ -146,11 +146,14 @@ def find_install(folder, roots=None):
 
 
 def content_dirs(library):
-    """Where `download_depot` writes in or beside a library: `steamapps/content`, and on Linux the
-    client's own `ubuntu12_32/steamapps/content` (the library that is the Steam root holds it)."""
+    """Where `download_depot` writes in or beside a library: `steamapps/content`; on Linux the
+    client's own `ubuntu12_32/steamapps/content`; on macOS the client's own
+    `Steam.AppBundle/Steam/Contents/MacOS/steamapps/content` (the library that is the Steam root
+    holds either)."""
     return [
         os.path.join(library, "steamapps", "content"),
         os.path.join(library, "ubuntu12_32", "steamapps", "content"),
+        os.path.join(library, "Steam.AppBundle", "Steam", "Contents", "MacOS", "steamapps", "content"),
     ]
 
 
