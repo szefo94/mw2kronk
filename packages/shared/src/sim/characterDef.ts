@@ -65,6 +65,12 @@ export const CHARACTER_ROLES = [
   "proneFire",
   "proneFireAds",
   "proneReload",
+  // Ghosts' knee slide, whole-body clips. Read so a Ghosts set loads; not in
+  // `LEG_ROLES` until a state poses them, so no mixer action is made for them.
+  "slide",
+  "slideEaseOut",
+  "slideToProne",
+  "slideEaseOutToProne",
 ] as const;
 
 export type CharacterRole = (typeof CHARACTER_ROLES)[number];

@@ -8,11 +8,14 @@ import pytest
 from scripts.cod.gltf import read_glb, write_glb
 from scripts.cod.viewmodel import (
     BALLISTIC_STRINGS,
+    CLIP_ROLES,
     DAMAGE,
     FORMAT_VERSION,
     LOCATIONS,
     MOTION,
+    OPTIONAL_CLIP_ROLES,
     SPREAD,
+    WEAPON_KEYS,
     ballistics,
     build_weapon_glb,
     check_fixed_bones,
@@ -126,6 +129,31 @@ def test_view_clips_must_be_asset_type_1(tmp_path):
         )
 
 
+def test_a_slide_clip_the_rig_cannot_take_costs_the_slide_and_not_the_weapon(tmp_path):
+    write_glb(tmp_path / "gun.glb", gun_gltf(), bytearray())
+    write_glb(tmp_path / "hands.glb", hands_gltf(), bytearray())
+    torso = [BoneTrack("tag_torso", None, Track([0], [[-7.5, -3.0, 1.5]]))]
+    clips = {
+        "viewmodel_gun_idle": view_clip("viewmodel_gun_idle", torso),
+        "vm_gun_slide_in": view_clip("vm_gun_slide_in", [BoneTrack("tag_view", Track([0], [[0, 0, 0.1, 1]]), None)]),
+        "vm_gun_slide_loop": view_clip("vm_gun_slide_loop", torso),
+    }
+    info = parse_infostring(
+        "\\".join(["WEAPONFILE", "gunModel", "viewmodel_gun", "idleAnim", "viewmodel_gun_idle"])
+        + "\\slideInAnim\\vm_gun_slide_in\\slideLoopAnim\\vm_gun_slide_loop"
+    )
+    paths = (tmp_path / "gun.glb", tmp_path / "hands.glb", tmp_path / "w.glb")
+    spec, _joints, problems = build_weapon_glb(*paths, "iw6", "gun_mp", info, clips)
+    assert spec["roles"] == {"idle": "viewmodel_gun_idle", "slideLoop": "vm_gun_slide_loop"}
+    assert problems == ["slideIn left out: vm_gun_slide_in moves tag_view, which the viewmodel assumes fixed"]
+    back, _ = read_glb(tmp_path / "w.glb")
+    assert sorted(a["name"] for a in back["animations"]) == ["viewmodel_gun_idle", "vm_gun_slide_loop"]
+    # A role every game has is still refused outright: a fault there is a misread, not a new kind of clip.
+    clips["viewmodel_gun_idle"] = view_clip("viewmodel_gun_idle", clips["vm_gun_slide_in"].bones)
+    with pytest.raises(ValueError, match="viewmodel_gun_idle moves tag_view"):
+        build_weapon_glb(*paths, "iw6", "gun_mp", info, clips)
+
+
 def test_a_clip_that_moves_the_eye_or_the_rigs_root_is_refused():
     # The gun's own root is not among them: Ghosts animates `j_gun` on four weapons,
     # which swings the gun under the hands and is what the animator meant.
@@ -142,6 +170,17 @@ def test_role_clips_match_names_case_blind_and_report_the_missing():
     assert missing == ["gone"]
     with pytest.raises(ValueError):
         parse_infostring("ATTACHMENTFILE\\a\\b")
+
+
+def test_a_slide_clip_is_read_like_any_role_but_no_weapon_has_to_carry_one():
+    """A partial backend must write every WEAPON_KEYS key or stages 8 and 9 refuse it,
+    so a slide key there would refuse every MW2, MW3, Black Ops and AW weapon."""
+    assert set(OPTIONAL_CLIP_ROLES) <= set(CLIP_ROLES)
+    assert not {CLIP_ROLES[role] for role in OPTIONAL_CLIP_ROLES} & set(WEAPON_KEYS)
+    assert {key for role, key in CLIP_ROLES.items() if role not in OPTIONAL_CLIP_ROLES} <= set(WEAPON_KEYS)
+    info = parse_infostring("WEAPONFILE\\idleAnim\\vm_ak12_idle\\slideLoopAnim\\vm_ak12_slide_loop")
+    roles, missing = role_clips(info, {"vm_ak12_idle", "vm_ak12_slide_loop"})
+    assert roles == {"idle": "vm_ak12_idle", "slideLoop": "vm_ak12_slide_loop"} and missing == []
 
 
 def test_hidden_bones_always_fold_the_backup_sight_when_the_gun_has_one():
@@ -234,6 +273,19 @@ def test_the_hit_locations_are_the_ones_the_engine_names():
     found = re.findall(r'^\s{2}"(\w+)",$', body, re.MULTILINE)
     assert found, "could not read HIT_LOCATIONS out of hitLocations.ts"
     assert list(LOCATIONS) == found
+
+
+def test_the_clip_roles_are_the_ones_the_engine_names():
+    """`CLIP_ROLES` keys are weaponDef.ts's `CLIP_ROLES`, in order.
+
+    The wire sends a role as its index in that list, so a role written only here is
+    one a peer cannot be told about. The order is kept so that both append alike.
+    """
+    text = open(os.path.abspath(os.path.join(SHARED, "weaponDef.ts")), encoding="utf-8").read()
+    start = text.index("export const CLIP_ROLES")
+    found = re.findall(r'^\s{2}"(\w+)",$', text[start : text.index("] as const", start)], re.MULTILINE)
+    assert found, "could not read CLIP_ROLES out of weaponDef.ts"
+    assert list(CLIP_ROLES) == found
 
 
 def test_definition_carries_the_damage_the_spread_and_the_hit_locations():

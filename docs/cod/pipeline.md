@@ -747,6 +747,22 @@ So a Modern Warfare set has 34 roles, Ghosts' and AW's 36 and Black Ops' all 38.
 Black Ops II plays Black Ops' set. Where each was found, and what else the zones
 ship: [reverse/cod-stance-anims](../../reverse/cod-stance-anims/README.md).
 
+**Ghosts adds its knee slide**, four whole-body roles no other game's table names:
+
+| Role                  | Ghosts                         |
+| --------------------- | ------------------------------ |
+| `slide`               | `pb_kneeslide`                 |
+| `slideEaseOut`        | `pb_kneeslide_ease_out`        |
+| `slideToProne`        | `pb_kneeslide_2prone`          |
+| `slideEaseOutToProne` | `pb_kneeslide_ease_out_2prone` |
+
+- **Source of the names:** Ghosts' MP animtree. It also lists a `pb_slide*` twin of each, which is
+  left out so all four come from one family. The roles are read off the clip names. No Ghosts zone
+  has been dumped with them yet, so the 36 above does not count them.
+- **AW** inherits the table, and takes any of the four its zone ships.
+- **The engine** reads the roles (`CHARACTER_ROLES`) but poses nothing with them. They are not in
+  `LEG_ROLES`, so a body makes no mixer action for them until a slide state does.
+
 **An idle is written as its first frame** (`characters.HELD_ROLES`). The engine
 holds a body at rest at phase 0 — a pose is a function of the state and of no
 clock — so the 8 to 20 seconds of fidgets after that frame would be bytes nothing

@@ -52,6 +52,10 @@ export const CLIP_ROLES = [
   "adsRechamber",
   "reloadStart",
   "reloadEnd",
+  // Ghosts' knee slide: exported, and played by nothing yet.
+  "slideIn",
+  "slideLoop",
+  "slideOut",
 ] as const;
 
 export type ClipRole = (typeof CLIP_ROLES)[number];

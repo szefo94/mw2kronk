@@ -34,8 +34,11 @@ left out is left out for a reason:
   under `segmentedReload` (`SEGMENTED_KEY` below).
 
 IW6's own additions have no OAT key and are not invented here: the camo models,
-the 82 clip slots IW5 has no role for (mantles, slides, fast and multiple
-reloads, the additive set) and `notetrackFXMap`.
+the 79 other clip slots IW5 has no role for (mantles, fast and multiple reloads,
+the additive set) and `notetrackFXMap`. The one exception is the slide's three
+slots, written as `slideInAnim`/`slideLoopAnim`/`slideOutAnim` after IW5's
+`sprint*Anim`, because the viewmodel export plays them
+(`viewmodel.OPTIONAL_CLIP_ROLES`).
 """
 
 import struct
@@ -330,13 +333,17 @@ ANIMS = {
     "blastRightAnim": 52,
     "blastBackAnim": 53,
     "blastLeftAnim": 54,
+    "slideInAnim": 55,
+    "slideLoopAnim": 56,
+    "slideOutAnim": 57,
     "adsUpAnim": 90,
     "adsDownAnim": 91,
     "altAdjustAnim": 93,
 }
 # `weapAnimFiles_t` in order, which is what an `animOverrides` row names. IW5 has
-# a key for 41 of these; the rest are IW6's own (the mantles, the slides, the fast
-# and multiple reloads, and the additive set a view clip is layered with).
+# a key for 41 of these, and ANIMS adds the three slide slots; the rest are IW6's
+# own (the mantles, the fast and multiple reloads, and the additive set a view clip
+# is layered with).
 ANIM_SLOTS = (
     "root idle empty_idle fire hold_fire lastshot rechamber grenade_prime grenade_prime_ready_to_throw melee_swipe "
     "melee_hit melee_fatal melee_miss melee_victim_crouching_hit melee_victim_crouching_fatal "

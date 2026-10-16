@@ -157,6 +157,13 @@ IW6_CLIP_ROLES = {
     "crouchReload": ("mp_crouch{}_reload",),
     "proneFire": ("pt_prone_shoot_auto",),
     "proneReload": ("mp_prone_reload_iw6",),
+    # The knee slide, which no MW or Black Ops body has. Names from the MP animtree;
+    # its `pb_slide*` twins are left out so all four come from one family. Whole-body
+    # clips, so NOT torso roles; nothing plays them yet (docs/cod/pipeline.md#the-player-clip-set).
+    "slide": ("pb_kneeslide",),
+    "slideEaseOut": ("pb_kneeslide_ease_out",),
+    "slideToProne": ("pb_kneeslide_2prone",),
+    "slideEaseOutToProne": ("pb_kneeslide_ease_out_2prone",),
 }
 # Advanced Warfare keeps Ghosts' sprint, jump, mantle and climb clips. Its `pb_hold_*`
 # idle and runs are empty-handed (they key no gun joint), so the armed set is its own:
