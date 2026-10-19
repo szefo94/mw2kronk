@@ -43,3 +43,8 @@ cod.config.json
 # supplies their own and names it in cod.config.json (docs/cod/README.md).
 durango_types.json
 scripts/cod/data/s1/layout.json
+
+# Every exported world (maps, props, the catalogue) is built from the owner's own game files and is never committed.
+# How and where to get them: VibeOnDuty2Browser docs/ASSETS-SETUP.md (owner's rule, 2026-10-18).
+/worlds/*
+!/worlds/AUTHORING.md
