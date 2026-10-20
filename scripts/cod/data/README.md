@@ -16,7 +16,7 @@ games, and the headers of [x64-zt](https://github.com/Joelrau/x64-zt) for the
 | `iw6/layout.json`               | Ghosts' PC struct layouts: each member's offset, size and type                                | `iw6/zone.py`                   |
 | `s1/layout_pc.json`             | Advanced Warfare's PC struct layouts, the same rows                                           | `s1/walkers.py`                 |
 
-`<g>` is `iw4` (MW2), `iw5` (MW3), `t5` (Black Ops) or `t6` (Black Ops II).
+`<g>` is `iw3` (CoD4), `iw4` (MW2), `iw5` (MW3), `t5` (Black Ops) or `t6` (Black Ops II).
 
 ## Overriding
 
@@ -32,11 +32,21 @@ needs, which is the source checkouts named above and a compiler, never a game.
 | Files                        | Generator                                      |
 | ---------------------------- | ---------------------------------------------- |
 | `iw4/`, `iw5/`, `t5/`, `t6/` | `reverse/x86-zone/build.sh [iw4\|iw5\|t5\|t6]` |
+| `iw3/`                       | `reverse/x86-zone/layout/zonecode.py iw3` and `infostring.py iw3`, from OAT at `06a121f7` (see below) |
 | `iw6/layout.json`            | `reverse/iw6-zone/layout/layout.sh`            |
 | `s1/layout_pc.json`          | `reverse/s1-zone/layout/layout.sh`             |
 
 A regenerated file should be byte-identical to the one here unless its source
 changed. Commit the two together.
+
+`iw3/` was generated without `build.sh`'s checks: its compiled layout and the
+struct-test and `*_load_db.cpp` comparisons need g++ in `-m32` mode and an OAT
+build, which a Mac has neither of. What stands in for them is the walk itself:
+every CoD4 zone the pipeline reads (the four exported maps, `common_mp.ff`,
+`localized_common_mp.ff`, `ui_mp.ff`, `code_post_gfx_mp.ff`) is walked to the
+last byte, each block's high-water mark the size its XFile header states. CoD4's
+weapon table is relative to `WeaponDef` itself (no `WeaponFullDef`); its paths are
+written as `weapDef.<path>`.
 
 ## What is not here
 

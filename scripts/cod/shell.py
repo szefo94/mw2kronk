@@ -46,6 +46,7 @@ def unpack_unit_vec(packed):
 # How each game packs a PackedUnitVec. IW6's is not the scale-byte packing
 # (scripts/cod/iw6/vertices.py); check_unit_vectors catches a game given the wrong one.
 UNIT_VEC_BY_GAME = {
+    "iw3": unpack_unit_vec,
     "iw4": unpack_unit_vec,
     "iw5": unpack_unit_vec,
     "t5": unpack_unit_vec,
@@ -80,6 +81,7 @@ SUPPORTED_GAMES = tuple(UNIT_VEC_BY_GAME)
 # 255 on all but 5 of theirs. Black Ops is the same: every coloured vertex of a plain
 # surface on zombie_theater is a tint (black bulbs, the teleporter's orange glow).
 LAYER_WEIGHTS_BY_GAME = {
+    "iw3": "alpha",
     "iw4": "alpha",
     "iw5": "alpha",
     "t5": "generated",

@@ -69,6 +69,11 @@ def set_model_surfs(walker, lod_info, model_surfs):
 
 # Per game, by the name zonecode.json gives each action (OAT's *_actions.cpp).
 ACTIONS = {
+    "iw3": {
+        "OnImageLoaded": on_image_loaded("cardMemory.platform[0]"),
+        "LoadImageData": load_image_data,
+        "SetSoundData": set_sound_data,
+    },
     "iw4": {
         "OnImageLoaded": on_image_loaded("cardMemory.platform[0]"),
         "LoadImageData": load_image_data,

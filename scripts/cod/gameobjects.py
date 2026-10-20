@@ -65,7 +65,16 @@ T5_ALLOWED = {
 
 # Ghosts: no entity in any of its zones carries the key, so there is nothing to allow.
 # Cold War's gametype scripts are not read, so, as on Ghosts, no entity is restricted to a mode.
-ALLOWED_BY_GAME = {"iw4": IW4_ALLOWED, "iw5": IW5_ALLOWED, "s1": S1_ALLOWED, "t5": T5_ALLOWED, "t6": {}, "iw6": {}, "t9": {}}
+ALLOWED_BY_GAME = {
+    "iw3": IW4_ALLOWED,
+    "iw4": IW4_ALLOWED,
+    "iw5": IW5_ALLOWED,
+    "s1": S1_ALLOWED,
+    "t5": T5_ALLOWED,
+    "t6": {},
+    "iw6": {},
+    "t9": {},
+}
 
 # twar.gsc falls back to Domination's spawns, and then keeps Domination's objects, when
 # a map lacks any of these.
@@ -134,7 +143,7 @@ def modes_of(game, entity, facts):
     if game == "t5" and value == T5_ALL_MODES:
         return None
     names = value.split()
-    if game in ("iw4", "iw5", "s1") and IW_ALWAYS in names:
+    if game in ("iw3", "iw4", "iw5", "s1") and IW_ALWAYS in names:
         return None
     known = known_names(game)
     unknown = sorted(n for n in names if n not in known)

@@ -58,7 +58,11 @@ IW5_ONLY_TEXTURES = set(
     "dustMap modelLightingMap oceanColorRampMap oceanDetailNormalMap oceanDisplacementMap oceanEnvMap oceanFoamMap "
     "oceanHeightNormalMap oceanPaintedFoamMap".split()
 )
-KNOWN_TEXTURES_BY_GAME = {"iw4": [n for n in KNOWN_TEXTURES if n not in IW5_ONLY_TEXTURES], "iw5": KNOWN_TEXTURES}
+KNOWN_TEXTURES_BY_GAME = {
+    "iw3": [n for n in KNOWN_TEXTURES if n not in IW5_ONLY_TEXTURES],
+    "iw4": [n for n in KNOWN_TEXTURES if n not in IW5_ONLY_TEXTURES],
+    "iw5": KNOWN_TEXTURES,
+}
 
 
 def constant_table(program):

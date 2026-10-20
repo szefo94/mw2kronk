@@ -40,15 +40,16 @@ You need the games, on Steam, on Linux, Windows or macOS. Nothing here is a game
 file: the importer reads your install and writes worlds you keep to yourself
 ([legality](#legality)).
 
-| Key      | Game                    | Steam folder                      | Notes                                                             |
-| -------- | ----------------------- | --------------------------------- | ----------------------------------------------------------------- |
-| `mw2`    | Modern Warfare 2 (2009) | `Call of Duty Modern Warfare 2`   | needs a 32-bit build ([below](#32-bit-builds)); Steam's is 64-bit |
-| `mw3`    | Modern Warfare 3 (2011) | `Call of Duty Modern Warfare 3`   | needs a 32-bit build; Steam's is 64-bit                           |
-| `bo1`    | Black Ops               | `Call of Duty Black Ops`          | needs a 32-bit build; Steam's still is one                        |
-| `bo2`    | Black Ops II            | `Call of Duty Black Ops II`       | needs a 32-bit build; Steam's still is one                        |
-| `ghosts` | Ghosts                  | `Call of Duty Ghosts`             | needs extra files ([below](#ghosts-and-advanced-warfare))         |
-| `aw`     | Advanced Warfare        | `Call of Duty Advanced Warfare`   | some maps need an extra file                                      |
-| `cw`     | Black Ops Cold War      | `Call of Duty Black Ops Cold War` | being added; needs an Oodle decoder                               |
+| Key      | Game                           | Steam folder                      | Notes                                                                                 |
+| -------- | ------------------------------ | --------------------------------- | ------------------------------------------------------------------------------------- |
+| `cod4`   | Call of Duty 4: Modern Warfare | `Call of Duty 4`                  | Steam's Windows or macOS build: both ship the same PC zones; no fx or world sound yet |
+| `mw2`    | Modern Warfare 2 (2009)        | `Call of Duty Modern Warfare 2`   | needs a 32-bit build ([below](#32-bit-builds)); Steam's is 64-bit                     |
+| `mw3`    | Modern Warfare 3 (2011)        | `Call of Duty Modern Warfare 3`   | needs a 32-bit build; Steam's is 64-bit                                               |
+| `bo1`    | Black Ops                      | `Call of Duty Black Ops`          | needs a 32-bit build; Steam's still is one                                            |
+| `bo2`    | Black Ops II                   | `Call of Duty Black Ops II`       | needs a 32-bit build; Steam's still is one                                            |
+| `ghosts` | Ghosts                         | `Call of Duty Ghosts`             | needs extra files ([below](#ghosts-and-advanced-warfare))                             |
+| `aw`     | Advanced Warfare               | `Call of Duty Advanced Warfare`   | some maps need an extra file                                                          |
+| `cw`     | Black Ops Cold War             | `Call of Duty Black Ops Cold War` | being added; needs an Oodle decoder                                                   |
 
 ### Set up Python
 

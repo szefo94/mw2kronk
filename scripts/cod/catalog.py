@@ -407,6 +407,31 @@ def build_one(work, worlds_root, game_key, weapon, info, hands_raw, iwi, states,
     return (entry, os.path.getsize(glb)), problems
 
 
+# Games whose third-person gun (`worldModel`) is packed beside each catalogued weapon,
+# as `worldweapons/<game>/<model>/<model>.glb`, for a client that has no other copy of
+# it. CoD4 alone so far: a player who sees another hold a CoD4 gun needs CoD4's.
+WORLD_MODEL_GAMES = {"iw3"}
+WORLD_TEXTURE_SIZE = 512
+
+
+def _world_models(work, worlds_root, game_key, entries, infos, iwi, states):
+    """Pack each entry's world model and name it on the entry (`worldModel`); returns how many."""
+    written = 0
+    for entry in entries:
+        model = (infos.get(entry["id"]) or {}).get("worldModel")
+        raw = _model_glb(os.path.join(work, "models"), model) if model else None
+        if raw is None:
+            continue
+        out = entry_dir(worlds_root, "worldweapons", game_key, model)
+        os.makedirs(out, exist_ok=True)
+        pack_one(raw, os.path.join(out, f"{model}.glb"), iwi, WORLD_TEXTURE_SIZE, states, False)
+        entry["worldModel"] = model
+        path = os.path.join(entry_dir(worlds_root, "weapons", game_key, entry["id"]), f"{entry['id']}.json")
+        write_text(path, json.dumps(entry, indent=1) + "\n")
+        written += 1
+    return written
+
+
 # The scope overlays are drawn at full screen height and carry their reticle in
 # the image, so they are kept at native size rather than the props' 512 px.
 OVERLAY_SIZE = 1024
@@ -619,6 +644,9 @@ def build_from_zone(work, worlds_root, game_key, states, hands=None):
         note = f"  !! {'; '.join(problems)}" if problems else ""
         fits = f"{len(entry['attachments']):2} att" if entry["attachments"] else "      "
         print(f"  + {entry['slot'][:4]} {entry['class']:15} {name:24} {size / 1e6:5.1f} MB {fits}{note}")
+
+    if game_key in WORLD_MODEL_GAMES:
+        print(f"  {_world_models(work, worlds_root, game_key, entries, bases, iwi, states)} world model(s)")
 
     overlays = _overlay_images(work, worlds_root, game_key, entries)
     if overlays:
@@ -949,7 +977,7 @@ def scan_entries(worlds_root, kinds=INDEXED_KINDS):
 
 # Which fastfile game key each games.json game uses. The zone listing would say
 # too, but only after a dump — and this picks which zone to dump.
-GAME_KEYS = {"mw2": "iw4", "mw3": "iw5", "bo1": "t5", "bo2": "t6", "ghosts": "iw6", "aw": "s1"}
+GAME_KEYS = {"cod4": "iw3", "mw2": "iw4", "mw3": "iw5", "bo1": "t5", "bo2": "t6", "ghosts": "iw6", "aw": "s1"}
 GAME_NAMES = {key: name for name, key in GAME_KEYS.items()}
 
 

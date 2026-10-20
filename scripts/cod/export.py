@@ -770,8 +770,8 @@ def export_navigation(map_name, out, data, pathdata=None):
     not dumped) is left as it is, with `written` None.
     """
     game_key = data.get("game")
-    if game_key == "iw4":
-        nav, why = None, "MW2's MP zones ship no path nodes"
+    if game_key in ("iw3", "iw4"):
+        nav, why = None, "CoD4's and MW2's MP zones ship no path nodes"
     elif game_key in NAV_GAMES:
         nav, why = from_ents.from_entities(data.get("entities", []), game_key, map_name)
     elif game_key in PATHDATA_GAMES:

@@ -30,9 +30,10 @@ FOLDER = "weapons"
 HEADER = "WEAPONFILE"
 ACCURACY_HEADER = "WEAPONACCUFILE"
 # How long each notetrack map is, (sounds, rumbles): the WeaponDef arrays' counts.
-NOTETRACKS = {"iw4": (16, 16), "iw5": (24, 16), "t5": (20, 0)}
+NOTETRACKS = {"iw3": (16, 0), "iw4": (16, 16), "iw5": (24, 16), "t5": (20, 0)}
 # The WeaponFullDef arrays that are the complete def's (T5's variant def's); every other one is the WeaponDef's.
 ON_COMPLETE = {
+    "iw3": set(),  # CoD4 has no complete def: the asset is the WeaponDef
     "iw4": {"szXAnims", "hideTags"},
     "iw5": {"szXAnims", "hideTags", "scopes", "underBarrels", "others"},
     "t5": {"szXAnims", "hideTags"},
@@ -103,7 +104,8 @@ class Weapon:
 
     def __init__(self, walk, complete, enums):
         self.walk, self.complete, self.enums = walk, complete, enums
-        self.weap_def = complete["weapDef"]
+        # CoD4's weapon asset is the WeaponDef itself, holding what IW4 split off.
+        self.weap_def = complete if getattr(complete, "type", None) == "WeaponDef" else complete["weapDef"]
 
     def script_string(self, index):
         return (self.walk.script_string(index) or "") if index is not None else ""

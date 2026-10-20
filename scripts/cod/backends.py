@@ -1,6 +1,6 @@
 """What dumps a fastfile into the tree every later stage reads, chosen by the fastfile itself.
 
-`scripts/cod/iw4` reads MW2, `scripts/cod/iw5` MW3, `scripts/cod/t5` Black Ops,
+`scripts/cod/iw3` reads CoD4, `scripts/cod/iw4` MW2, `scripts/cod/iw5` MW3, `scripts/cod/t5` Black Ops,
 `scripts/cod/t6` Black Ops II, `scripts/cod/iw6` Ghosts, `scripts/cod/s1` Advanced Warfare and `scripts/cod/t9`
 Black Ops Cold War. All of them write
 the same files in the same schema, told apart only by `_game`
@@ -23,6 +23,7 @@ the same files in the same schema, told apart only by `_game`
 
 import sys
 
+from .iw3.backend import Backend as Iw3Backend
 from .iw4.backend import Backend as Iw4Backend
 from .iw5.backend import Backend as Iw5Backend
 from .iw6.backend import Backend as Iw6Backend
@@ -33,7 +34,7 @@ from .t9.backend import Backend as T9Backend
 
 # Each backend claims a fastfile by its own header (magic and version). Two
 # claiming the same file would mean one of those headers is wrong.
-BACKENDS = (Iw4Backend, Iw5Backend, T5Backend, T6Backend, Iw6Backend, S1Backend, T9Backend)
+BACKENDS = (Iw3Backend, Iw4Backend, Iw5Backend, T5Backend, T6Backend, Iw6Backend, S1Backend, T9Backend)
 
 
 def for_fastfile(fastfile, search=None):

@@ -61,6 +61,7 @@ def absolute_joints(xmodel_dir, model, gltf):
 # Where each game keeps its animated-model scripts: text rawfiles found by path, or
 # compiled scriptfiles named by number, which are all read (docs/cod/games.md).
 SCRIPTS_BY_GAME = {
+    "iw3": "text",
     "iw4": "text",
     "iw5": "compiled",
     "t5": "text",

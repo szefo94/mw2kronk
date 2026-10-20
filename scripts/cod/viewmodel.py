@@ -25,7 +25,7 @@ from .textures import texture_index
 
 # The weapon each game's worlds hold by default; `_overrides.json` "viewmodel" picks another.
 # Black Ops' is the M16, what its first default class carries.
-DEFAULT_WEAPON = {"iw4": "m4_mp", "iw5": "iw5_m4_mp", "iw6": "iw6_ak12_mp", "t5": "m16_mp"}
+DEFAULT_WEAPON = {"iw3": "m4_mp", "iw4": "m4_mp", "iw5": "iw5_m4_mp", "iw6": "iw6_ak12_mp", "t5": "m16_mp"}
 
 
 def weapon_key(game, name):

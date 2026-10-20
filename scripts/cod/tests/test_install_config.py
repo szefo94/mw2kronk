@@ -338,7 +338,7 @@ def test_folders_are_classified_by_steam_api_and_exe(tmp_path):
 
 
 def test_the_games_walked_with_32_bit_layouts_are_the_ones_checked():
-    assert [g for g, d in config.games().items() if installs.needs_32bit(d)] == ["mw2", "mw3", "bo1", "bo2"]
+    assert [g for g, d in config.games().items() if installs.needs_32bit(d)] == ["cod4", "mw2", "mw3", "bo1", "bo2"]
     for game in ("mw2", "mw3", "bo1", "bo2"):
         assert installs.depot_commands(game), game
 

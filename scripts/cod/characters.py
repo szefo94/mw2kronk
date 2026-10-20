@@ -180,7 +180,14 @@ S1_CLIP_ROLES = {
     "fireAds": ("pt_stand_shoot_auto_ads",),
 }
 # Black Ops ships every one of MW's names in its own common_mp.ff.
-CLIP_ROLES_BY_GAME = {"iw4": IW_CLIP_ROLES, "iw5": IW_CLIP_ROLES, "iw6": IW6_CLIP_ROLES, "t5": IW_CLIP_ROLES, "s1": S1_CLIP_ROLES}
+CLIP_ROLES_BY_GAME = {
+    "iw3": IW_CLIP_ROLES,
+    "iw4": IW_CLIP_ROLES,
+    "iw5": IW_CLIP_ROLES,
+    "iw6": IW6_CLIP_ROLES,
+    "t5": IW_CLIP_ROLES,
+    "s1": S1_CLIP_ROLES,
+}
 # Roles whose clip is laid over a `pb_` one, replacing the bones it keys: the spine
 # and above, or the whole body for Ghosts' and AW's prone reload.
 TORSO_ROLES = (
@@ -235,6 +242,7 @@ T5_ANIM_TYPE_SUFFIX = {"pistol": "pistol", "rocketlauncher": "rpg"}
 # The three classes AW names clips for (`pb_sprint_assault`, `_smg`, `_sniper`).
 S1_ANIM_TYPE_SUFFIX = {"autorifle": "assault", "smg": "smg", "sniper": "sniper"}
 ANIM_TYPE_SUFFIX_BY_GAME = {
+    "iw3": IW_ANIM_TYPE_SUFFIX,
     "iw4": IW_ANIM_TYPE_SUFFIX,
     "iw5": IW_ANIM_TYPE_SUFFIX,
     "iw6": IW6_ANIM_TYPE_SUFFIX,
@@ -264,7 +272,7 @@ HEAD_PREFIX = "head_"
 # that matches no body is one no body should wear. Ghosts does not: its rangers
 # wear any of the zone's interchangeable `head_mp_head_*`, and only the
 # juggernaut's and the infected's heads are a body's own.
-HEADS_ARE_A_BODYS_BY_GAME = {"iw4": True, "iw5": True, "iw6": False}
+HEADS_ARE_A_BODYS_BY_GAME = {"iw3": True, "iw4": True, "iw5": True, "iw6": False}
 # The one word a body and its head disagree on: MW2 writes the allied faction
 # `ally` on a body and `allies` on that body's head
 # (`mp_body_ally_sniper_ghillie_desert`, `head_allies_sniper_ghillie_desert`).

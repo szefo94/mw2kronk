@@ -1,5 +1,22 @@
 {
   "_comment": "What each game's install looks like. Every path is relative to an install root; a game may have several roots (Steam depots downloaded one by one), and each path is looked up in every root, in order. `depots` are the Steam depots of the 32-bit build, in root order, each with the manifest the pipeline was built against; `merge_depots` means the game reads its folders as one tree, so its depots must be copied into one folder. `probe` is an executable read only to tell a 32-bit build from a 64-bit one. Where the roots are: installs.py and cod.config.json (docs/cod/README.md).",
+  "cod4": {
+    "title": "Call of Duty 4: Modern Warfare",
+    "engine": "iw3",
+    "steam": {
+      "app": 7940,
+      "folder": "Call of Duty 4"
+    },
+    "_layouts": "The Windows install keeps zone/ and main/ at its root; the Steam macOS build (Aspyr) keeps the same PC zones and .iwd archives inside its app bundle.",
+    "zones": ["zone/english", "Call of Duty 4.app/Contents/Call of Duty 4 Data/zone/english"],
+    "search": ["main", "Call of Duty 4.app/Contents/Call of Duty 4 Data/main"],
+    "exe": "iw3mp.exe",
+    "maps": {
+      "match": "^mp_",
+      "beside": "{map}_load.ff"
+    },
+    "depots": []
+  },
   "mw2": {
     "title": "Modern Warfare 2 (2009)",
     "engine": "iw4",

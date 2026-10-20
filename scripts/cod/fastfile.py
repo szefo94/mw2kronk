@@ -28,12 +28,12 @@ import zlib
 from collections import namedtuple
 
 from .t6 import ff as t6_ff
-from .zone.spec import IW4, IW5, T5, T6
+from .zone.spec import IW3, IW4, IW5, T5, T6
 
 SIGNED = b"IWff0100"
 UNSIGNED = b"IWffu100"
 AUTH_MAGIC = b"IWffs100"
-VERSIONS = {0x114: IW4, 1: IW5, 0x1D9: T5}
+VERSIONS = {5: IW3, 0x114: IW4, 1: IW5, 0x1D9: T5}
 CHUNK = 0x2000  # AUTHED_CHUNK_SIZE
 CHUNKS_PER_MASTER = CHUNK // 32  # 256
 # DB_AuthHeader: magic, reserved, subheader hash @12, RSA signature @44, subheader @300.
@@ -61,10 +61,11 @@ def claim(path):
     spec = VERSIONS.get(version)
     if spec is None:
         return None
-    if magic == SIGNED and spec is not T5:
+    if magic == SIGNED and spec not in (T5, IW3):
         return Container(spec, True, AUTH_AT)
     if magic == UNSIGNED:
-        return Container(spec, False, 12 if spec is T5 else AUTH_AT)
+        # T5 and IW3 (CoD4 PC, version 5) have no byte or timestamp: zlib starts at 12.
+        return Container(spec, False, 12 if spec in (T5, IW3) else AUTH_AT)
     return None
 
 
