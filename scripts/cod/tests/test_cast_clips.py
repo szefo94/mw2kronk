@@ -7,6 +7,8 @@ has, which leaves that body's bone where its bind pose put it.
 """
 
 import json
+import re
+from pathlib import Path
 
 from scripts.cod import cast_clips
 from scripts.cod.characters import (
@@ -38,6 +40,9 @@ STANCE_ROLES = [
     "proneFireAds",
     "proneReload",
 ]
+# Ghosts' knee slide (sim/characterDef.ts), which no MW or Black Ops body has.
+SLIDE_ROLES = ["slide", "slideEaseOut", "slideToProne", "slideEaseOutToProne"]
+CHARACTER_DEF = Path(__file__).resolve().parents[3] / "packages/shared/src/sim/characterDef.ts"
 
 
 def test_every_stance_role_is_a_clip_of_some_game_and_no_table_names_another():
@@ -46,10 +51,35 @@ def test_every_stance_role_is_a_clip_of_some_game_and_no_table_names_another():
     assert set(STANCE_ROLES) - set(IW6_CLIP_ROLES) == {"proneIdleAds", "proneFireAds"}
     standing = set(IW_CLIP_ROLES) - set(STANCE_ROLES)
     for game, table in CLIP_ROLES_BY_GAME.items():
-        assert set(table) <= standing | set(STANCE_ROLES), game
+        assert set(table) <= standing | set(STANCE_ROLES) | set(SLIDE_ROLES), game
     # An overlay is a torso role, or the engine plays it as a pair of legs.
     overlays = {r for r in STANCE_ROLES if r.endswith(("Fire", "FireAds", "Reload"))}
     assert overlays <= set(TORSO_ROLES) and not (set(TORSO_ROLES) & set(HELD_ROLES))
+    # A slide is a whole-body clip that plays through, so it is neither layered nor held.
+    assert set(SLIDE_ROLES) <= set(IW6_CLIP_ROLES) and not set(SLIDE_ROLES) & set(IW_CLIP_ROLES)
+    assert not set(SLIDE_ROLES) & (set(TORSO_ROLES) | set(HELD_ROLES))
+
+
+def test_every_role_a_table_names_is_one_the_engine_reads():
+    """`readCharacterSet` throws on a role `CHARACTER_ROLES` lacks, so a role named only
+    here turns that game's whole clip set into a load error, not one missing clip."""
+    text = CHARACTER_DEF.read_text(encoding="utf-8")
+    start = text.index("export const CHARACTER_ROLES")
+    known = set(re.findall(r'^\s{2}"(\w+)",$', text[start : text.index("] as const", start)], re.MULTILINE))
+    assert known, "could not read CHARACTER_ROLES out of characterDef.ts"
+    for game, table in CLIP_ROLES_BY_GAME.items():
+        assert set(table) <= known, (game, set(table) - known)
+
+
+def test_ghosts_slides_on_its_knees_and_modern_warfare_does_not_slide():
+    zone = {"pb_kneeslide", "pb_kneeslide_ease_out", "pb_kneeslide_2prone", "pb_kneeslide_ease_out_2prone", "pb_slide"}
+    assert clip_names("iw6", {"playerAnimType": "autorifle"}, zone) == {
+        "slide": "pb_kneeslide",
+        "slideEaseOut": "pb_kneeslide_ease_out",
+        "slideToProne": "pb_kneeslide_2prone",
+        "slideEaseOutToProne": "pb_kneeslide_ease_out_2prone",
+    }
+    assert clip_names("iw5", {"playerAnimType": "autorifle"}, zone) == {}
 
 
 def test_clip_names_reads_each_familys_stance_names():

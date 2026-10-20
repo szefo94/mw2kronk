@@ -5,6 +5,13 @@ docs/cod/reference.md#lightmaps. Three shapes:
 
 - **IW4/IW5**: one pair of pages, and the signal this pipeline takes is the
   secondary's alpha, at full resolution.
+- **IW3** (CoD4): IW4's pair (an A8 primary, an RGBA8 secondary half as wide),
+  whose alpha holds no light (centred on 128, as IW4's). The secondary's RGB is
+  read instead: its two stacked halves are the ambient and highlight lobes
+  Ghosts names (docs/cod/reference.md#lightmaps), summed per texel into one
+  page-sized image of `(ambient + highlight) / 2`, linear. `lightmap-intensity`
+  is solved so that the median lit texel is worth IW3_TARGET as an ambient
+  light at the client's x6 (src/v2/world.js reads an iw3 world as an iw4 one).
 - **T5** (Black Ops): an R5G6B5 secondary of two pages and a G16R16 secondaryB per
   lightmap, which the shaders combine into an ambient and a directional colour
   beside a live sun. `t5/lightmap.py` bakes their sum per texel, as T6's is, and
@@ -61,6 +68,11 @@ IW_PRIMARY = "_lightmap0_primary"
 #: (LIGHTMAP_SCALE in packages/client/src/scene/lights.ts).
 IW_INTENSITY = 0.1
 
+#: IW3: the ambient light the median lit texel of `(ambient + highlight) / 2` is
+#: worth, which is what an IW4 shell gets everywhere from its alpha (128 x 0.1 x 6).
+IW3_TARGET = 0.3
+IW3_GAMES = ("iw3",)
+
 #: The games that keep IW6's pair per page; everything else is read as IW4/IW5.
 PAGED_GAMES = ("iw6", "s1")
 #: The games whose lightmap is not decoded yet, so none is written (see above).
@@ -101,7 +113,36 @@ def convert(img_root, out_dir, game, manifest_path=None):
     index = texture_index(img_root)
     if game in BAKED_GAMES:
         return _baked(BAKED_GAMES[game], index, out_dir, manifest_path)
+    if game in IW3_GAMES:
+        return _iw3(index, out_dir)
     return _iw6(index, out_dir) if game in PAGED_GAMES else _iw(index, out_dir)
+
+
+def _iw3(index, out_dir):
+    """CoD4: the secondary's two RGB lobes summed (module docstring), and the primary beside it for reference."""
+    from PIL import ImageChops
+
+    if IW_PRIMARY in index:
+        try:
+            decode_texture(index[IW_PRIMARY])[0].save(os.path.join(out_dir, PRIMARY))
+        except Exception as e:
+            print(f"      lightmap primary: {e}")
+    if IW_SECONDARY not in index:
+        return None
+    img = decode_texture(index[IW_SECONDARY])[0].convert("RGB")
+    w, h = img.size
+    top, bottom = img.crop((0, 0, w, h // 2)), img.crop((0, h // 2, w, h))
+    page = ImageChops.add(top, bottom, scale=2.0)  # (a + b) / 2: no texel clips
+    page.save(os.path.join(out_dir, LIGHTMAP))
+    hist = page.convert("L").histogram()
+    lit = sum(hist[1:])
+    median, seen = 128, 0
+    for value in range(1, 256):
+        seen += hist[value]
+        if lit and seen >= lit / 2:
+            median = value
+            break
+    return Atlas(LIGHTMAP, None, round(IW3_TARGET * 255 / (6 * median), 4))
 
 
 def _iw(index, out_dir):

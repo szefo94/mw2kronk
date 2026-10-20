@@ -211,6 +211,7 @@ def test_ghosts_contents_bits_are_the_engines_own_infoparms():
 
 def test_ghosts_advanced_warfare_and_black_ops_ii_collide_with_a_soup_surface_that_blocks_the_player():
     assert SOUP_CLIPS_COLLIDE_BY_GAME == {
+        "iw3": False,
         "iw4": False,
         "iw5": False,
         "t5": False,

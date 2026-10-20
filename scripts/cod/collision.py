@@ -122,6 +122,7 @@ CONTENTS_BITS_IW6 = (
 # `6-s1_mp_fast_server.map`) names every contents bit, and every one it names is
 # one of Ghosts'. reverse/s1-zone/README.md#the-contents-and-surface-tables.
 CONTENTS_BITS_BY_GAME = {
+    "iw3": CONTENTS_BITS_IW,
     "iw4": CONTENTS_BITS_IW,
     "iw5": CONTENTS_BITS_IW,
     "t5": CONTENTS_BITS_T5,
@@ -182,6 +183,7 @@ SURFACE_TYPES_S1 = (
     "plastic", "rock", "rock", "water", "water", "wood", "wood", "wood", "cushion",
 )  # fmt: skip
 SURFACE_TYPES_BY_GAME = {
+    "iw3": SURFACE_TYPES_IW,
     "iw4": SURFACE_TYPES_IW,
     "iw5": SURFACE_TYPES_IW,
     "t5": SURFACE_TYPES_T5,
@@ -204,7 +206,16 @@ SURFACE_TYPES_BY_GAME = {
 # contents meet the trace's mask (CM_TraceThroughAabbTree 0x6a79a1), and a live
 # player's mask has playerclip (ClientThink_real 0x5bf69a). 128 to 3,853 triangles
 # a map, most of them beside nothing else a player collides with.
-SOUP_CLIPS_COLLIDE_BY_GAME = {"iw4": False, "iw5": False, "t5": False, "t6": True, "iw6": True, "s1": True, "t9": False}
+SOUP_CLIPS_COLLIDE_BY_GAME = {
+    "iw3": False,
+    "iw4": False,
+    "iw5": False,
+    "t5": False,
+    "t6": True,
+    "iw6": True,
+    "s1": True,
+    "t9": False,
+}
 
 # What a player's trace and a bullet's stop, where a game's code has said, as
 # (player mask, bullet mask). Black Ops II: a live player's `pm->tracemask`

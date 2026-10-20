@@ -141,7 +141,16 @@ def keep_flag_weights(gltf, buf, states):
 # Whether a game's prop vertex RGB holds layer weights rather than a tint. IW6's is
 # grey on every non-foliage vertex of mp_prisonbreak's models, as on IW4 and IW5.
 # Black Ops II's is white on 94.5% of mp_la's model vertices and grey on most of the rest.
-RGB_IS_LAYER_WEIGHTS_BY_GAME = {"iw4": False, "iw5": False, "t5": True, "t6": False, "iw6": False, "s1": False, "t9": False}
+RGB_IS_LAYER_WEIGHTS_BY_GAME = {
+    "iw3": False,
+    "iw4": False,
+    "iw5": False,
+    "t5": True,
+    "t6": False,
+    "iw6": False,
+    "s1": False,
+    "t9": False,
+}
 
 
 def neutralize_vertex_colours(gltf, buf, also_rgb=False):

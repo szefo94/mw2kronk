@@ -28,7 +28,7 @@ OAT = oat()
 # What the importer reads (zonecode.json and the field and name tables) is written into
 # its tracked data, scripts/cod/data/<g>/; intermediates such as layout.json stay in ../out/.
 DATA = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "scripts", "cod", "data"))
-GAMES = {"iw4": "IW4", "iw5": "IW5", "t5": "T5", "t6": "T6"}
+GAMES = {"iw3": "IW3", "iw4": "IW4", "iw5": "IW5", "t5": "T5", "t6": "T6"}
 POINTER_SIZE = 4  # every game here is a 32-bit zone (`wordsize 32;`)
 DEFAULT_PACK = 8  # Parser/Parsing/Impl/PackDefinitionStreamProxy.h
 

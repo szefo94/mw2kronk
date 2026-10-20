@@ -2,7 +2,7 @@
   "_comment": [
     "Copy to cod.config.json (gitignored) or point $COD_CONFIG at a copy, then run `python3 -m scripts.cod doctor`.",
     "Every key is optional: a game left out is found in your Steam libraries, as its install or its downloaded depots.",
-    "games.<game>: one folder, a list of folders, or {\"dirs\": [...], \"exe\": \"<file>\", \"use\": \"auto|depots|install\"}. Games: mw2 mw3 bo1 bo2 ghosts aw cw.",
+    "games.<game>: one folder, a list of folders, or {\"dirs\": [...], \"exe\": \"<file>\", \"use\": \"auto|depots|install\"}. Games: cod4 mw2 mw3 bo1 bo2 ghosts aw cw.",
     "dirs: folders used as given (a full 32-bit install anywhere, or depot folders). --game-dir <game>=<dir> and $COD_<GAME>_DIR win over them.",
     "use: what Steam detection may pick when no dirs are named: auto (a 32-bit install, else the depots), depots, or install. --use <game>=... wins.",
     "MW2, MW3, Black Ops and Black Ops II must be 32-bit builds: docs/cod/README.md#32-bit-builds.",

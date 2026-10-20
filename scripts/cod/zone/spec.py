@@ -129,6 +129,15 @@ class ZoneSpec:
 # AW reads with it too: its block model is IW6's (reverse/s1-zone/README.md).
 IW6 = ZoneSpec("iw6", ("TEMP", "PHYSICAL", "RUNTIME", "VIRTUAL", "LARGE", "CALLBACK", "SCRIPT"), frozenset({"RUNTIME"}), 8)
 # reverse/x86-zone/README.md#blocks: each ZoneLoaderFactory's SetupBlock, and blockBitCount.
+# IW3 (CoD4): T5's block order plus VERTEX and INDEX, IW4's 4-bit block field
+# (ZoneLoaderFactoryIW3's SetupBlock, ZoneConstantsIW3's OFFSET_BLOCK_BIT_COUNT).
+IW3 = ZoneSpec(
+    "iw3",
+    ("TEMP", "RUNTIME", "LARGE_RUNTIME", "PHYSICAL_RUNTIME", "VIRTUAL", "LARGE", "PHYSICAL", "VERTEX", "INDEX"),
+    frozenset({"RUNTIME", "LARGE_RUNTIME", "PHYSICAL_RUNTIME"}),
+    4,
+    block_bits=4,
+)
 IW4 = ZoneSpec(
     "iw4",
     ("TEMP", "PHYSICAL", "RUNTIME", "VIRTUAL", "LARGE", "CALLBACK", "VERTEX", "INDEX"),
@@ -163,4 +172,4 @@ T6 = ZoneSpec(
     block_bits=3,
     depends=True,
 )
-SPECS = {spec.game: spec for spec in (IW4, IW5, T5, T6, IW6)}
+SPECS = {spec.game: spec for spec in (IW3, IW4, IW5, T5, T6, IW6)}

@@ -101,9 +101,17 @@ def split_levels(fmt, maptype, width, height, depth, mips, data, largest_first):
     return levels
 
 
+IWI6_HEADER = struct.Struct("<3sBbB3H4I")  # tag, version, format, flags (a byte), dims, file size per picmip
+IWI6_FLAGS = ((0x2, NOMIPMAPS), (0x4, CUBE), (0x8, VOLUME))  # v6 flag -> the v8 flag read below
+
+
 def from_loaddef(record, raw):
     """A Texture from pixels the zone carries, or a reason it has none."""
     _levels, flags, d3d, size = LOADDEF.unpack_from(raw, 0)
+    if getattr(getattr(record, "walk", None), "game", None) == "iw3":
+        # CoD4's loadDef is `levelCount, flags (a byte), dimensions[3], format, resourceSize`:
+        # the same 16 bytes, with IWI v6's flag bits in byte 1 (OAT IW3_Assets.h).
+        flags = sum(v8 for v6, v8 in IWI6_FLAGS if raw[1] & v6)
     fmt = D3D.get(d3d & 0xFFFFFFFF)
     if fmt is None:
         return f"D3D format {d3d:#x}"
@@ -118,8 +126,21 @@ def from_loaddef(record, raw):
     return Texture(fmt, maptype, width, height, depth, mips, levels)
 
 
+def iwi6_as_iwi8(data):
+    """CoD4's IWI v6 as the v8 file it would be: v6 has a one-byte flags field after the
+    format, numbering the cube and volume bits 4 and 8 (OAT IwiTypes.h `iwi6`), and a
+    28-byte header that its picmip sizes count. Formats share one numbering."""
+    _tag, _version, fmtid, flags6, width, height, depth, *picmip = IWI6_HEADER.unpack_from(data, 0)
+    flags = sum(v8 for v6, v8 in IWI6_FLAGS if flags6 & v6)
+    grow = IWI_HEADER.size - IWI6_HEADER.size
+    picmip = [p + grow if p else 0 for p in picmip]
+    return IWI_HEADER.pack(b"IWi", 8, flags, fmtid, width, height, depth, *picmip) + data[IWI6_HEADER.size :]
+
+
 def from_iwi(data, tables):
-    """A Texture from an IWI v8 file, or a reason it cannot be read."""
+    """A Texture from an IWI v8 (or CoD4's v6) file, or a reason it cannot be read."""
+    if data[:4] == b"IWi\x06":
+        data = iwi6_as_iwi8(data)
     if data[:4] != b"IWi\x08":
         return "not an IWI v8"
     _tag, _version, flags, fmtid, width, height, depth, *picmip = IWI_HEADER.unpack_from(data, 0)
@@ -246,7 +267,7 @@ def write(walk, out, ctx=None):
             if data is None:
                 skipped["no .iwi in the search path"] += 1
                 continue
-            fmtid = data[8] if len(data) > 8 else None
+            fmtid = (data[4] if data[3] == 6 else data[8]) if len(data) > 8 else None
             texture = from_iwi(data, tables.get() if fmtid in WAVELET else None)
             source = "wavelet" if fmtid in WAVELET else "archive"
         if isinstance(texture, str):

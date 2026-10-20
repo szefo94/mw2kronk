@@ -36,6 +36,8 @@ REPLACE_EQUATIONS = {("one", "zero"), ("srcalpha", "zero")}
 # the wrong row is silent; `check_state_flags` is the guard.
 Techniques = namedtuple("Techniques", "depth_prepass unlit emissive lit")
 TECHNIQUES_BY_GAME = {
+    # IW3 (OAT IW3_Assets.h): no EMISSIVE_DFOG pair, so LIT is 7.
+    "iw3": Techniques(0x0, 0x4, 0x5, 0x7),
     "iw4": Techniques(0x0, 0x4, 0x5, 0x9),
     "iw5": Techniques(0x0, 0x4, 0x5, 0x9),
     "t5": Techniques(0x0, 0x4, 0x5, 0xA),
@@ -72,6 +74,7 @@ DROP_TECHSETS = ("falloff", "tools", "shadowcaster")
 SurfaceRules = namedtuple("SurfaceRules", "drop_techsets drop_prefixes not_decals colour_map")
 IW_SURFACES = SurfaceRules(DROP_TECHSETS, (), (), None)
 SURFACES_BY_GAME = {
+    "iw3": IW_SURFACES,
     "iw4": IW_SURFACES,
     "iw5": IW_SURFACES,
     "t5": IW_SURFACES,
@@ -157,7 +160,16 @@ def material_blend_mode(state):
 # Cold War's technique sets are hashes: no token can name its flag wind, so none matches.
 # Black Ops II has `mc_lit_sm_flag_…` sets, whose wind is its own shader's and not
 # the ported one, so none is matched and its flags stay still.
-FLAG_TECHSETS_BY_GAME = {"iw4": "flag", "iw5": "flag", "t5": "flag", "t6": "\0", "iw6": "_flag_", "s1": "_flag_", "t9": "\0"}
+FLAG_TECHSETS_BY_GAME = {
+    "iw3": "flag",
+    "iw4": "flag",
+    "iw5": "flag",
+    "t5": "flag",
+    "t6": "\0",
+    "iw6": "_flag_",
+    "s1": "_flag_",
+    "t9": "\0",
+}
 
 
 def is_flag_technique(techset, game_key):

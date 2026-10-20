@@ -45,13 +45,13 @@ def main(argv=None):
     )
     cat.add_argument(
         "--game",
-        choices=("iw4", "iw5", "t5", "t6", "iw6", "s1"),
+        choices=("iw3", "iw4", "iw5", "t5", "t6", "iw6", "s1"),
         help="which game --work holds; read from its zone listing if omitted",
     )
     cat.add_argument("--hands", help="the view-hands model to rig weapons onto (default: the zone's plainest pair)")
     cat.add_argument(
         "--dump",
-        choices=("mw2", "mw3", "bo1", "bo2", "ghosts", "aw"),
+        choices=("cod4", "mw2", "mw3", "bo1", "bo2", "ghosts", "aw"),
         help="dump that game's companion zone first, then take every weapon from it",
     )
     cat.add_argument(

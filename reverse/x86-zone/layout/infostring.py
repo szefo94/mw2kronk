@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Turn OAT's weapon field table for one game into scripts/cod/data/<g>/weapon_fields.json.
 
-    infostring.py <iw4|iw5|t5|t6> [-o scripts/cod/data/<g>/weapon_fields.json]
+    infostring.py <iw3|iw4|iw5|t5|t6> [-o scripts/cod/data/<g>/weapon_fields.json]
 
 For IW5, beside it, attachment_enums.json: the spelling OAT's attachment JSON gives
 each enum value (`JsonWeaponAttachment.h`), {C enum type: {enumerator: string}},
@@ -36,8 +36,9 @@ import re
 
 import oat
 
-FIELDS = {g: ("src", "ObjCommon", "Game", g.upper(), "Weapon", "WeaponFields.h") for g in ("iw4", "iw5", "t5", "t6")}
+FIELDS = {g: ("src", "ObjCommon", "Game", g.upper(), "Weapon", "WeaponFields.h") for g in ("iw3", "iw4", "iw5", "t5", "t6")}
 NAME_TABLES = {
+    "iw3": ("src", "ObjCommon", "Game", "IW3", "Weapon", "WeaponStrings.h"),
     "iw4": ("src", "ObjCommon", "Game", "IW4", "InfoString", "EnumStrings.h"),
     "iw5": FIELDS["iw5"],
     "t5": ("src", "ObjCommon", "Game", "T5", "Weapon", "WeaponStrings.h"),
@@ -53,7 +54,9 @@ EXTRA_TABLES = {
 }
 ATTACHMENT_JSON = {"iw5": ("src", "ObjCommon", "Game", "IW5", "Weapon", "JsonWeaponAttachment.h")}
 
-ROW = re.compile(r'\{\s*"(\w+)"\s*,\s*offsetof\(\s*WeaponFullDef\s*,\s*([^)]+?)\s*\)\s*,\s*(\w+)\s*\}')
+# IW3's table is relative to WeaponDef itself (there is no complete def): its paths are
+# written as `weapDef.<path>`, which the dumper resolves on the one record.
+ROW = re.compile(r'\{\s*"(\w+)"\s*,\s*offsetof\(\s*(WeaponFullDef|WeaponDef)\s*,\s*([^)]+?)\s*\)\s*,\s*(\w+)\s*\}')
 FLAME_ROW = re.compile(r'\{\s*"(\w+)"\s*,\s*offsetof\(\s*FlameTable\s*,\s*([^)]+?)\s*\)\s*,\s*(\w+)\s*\}')
 
 
@@ -73,7 +76,10 @@ def parse(text, names_text=None):
     the header holding the name tables when that is another one."""
     table = text[text.index("weapon_fields[]") :]
     table = table[: table.index("};")]
-    fields = [[key, path.replace(" ", ""), kind] for key, path, kind in ROW.findall(table)]
+    fields = [
+        [key, ("weapDef." if struct == "WeaponDef" else "") + path.replace(" ", ""), kind]
+        for key, struct, path, kind in ROW.findall(table)
+    ]
     names = {name: STRING.findall(body) for name, body in NAMES.findall(names_text or text)}
     return {"fields": fields, "names": names}
 

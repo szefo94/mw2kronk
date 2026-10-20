@@ -62,7 +62,7 @@ export const PROPERTY_KINDS: Record<string, PropertyKind> = {
   // the catalogue's paths use (`catalog/<kind>/<game>/<id>`) rather than the
   // friendly name, so no table maps one to the other. `category` is prose for the
   // menu; this is the engine's, and what picks a game's factions and player clips.
-  game: { valueKind: "enum", enumValues: ["iw4", "iw5", "iw6", "t5", "t6", "s1"], minArity: 1, maxArity: 1 },
+  game: { valueKind: "enum", enumValues: ["iw3", "iw4", "iw5", "iw6", "t5", "t6", "s1"], minArity: 1, maxArity: 1 },
   // `model` only: a baked lighting texture, sampled through the glTF's second UV set.
   lightmap: { valueKind: "string", minArity: 1, maxArity: 1 },
   "lightmap-intensity": { valueKind: "number", unit: "none", minArity: 1, maxArity: 1 },

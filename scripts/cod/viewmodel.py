@@ -25,7 +25,7 @@ from .textures import texture_index
 
 # The weapon each game's worlds hold by default; `_overrides.json` "viewmodel" picks another.
 # Black Ops' is the M16, what its first default class carries.
-DEFAULT_WEAPON = {"iw4": "m4_mp", "iw5": "iw5_m4_mp", "iw6": "iw6_ak12_mp", "t5": "m16_mp"}
+DEFAULT_WEAPON = {"iw3": "m4_mp", "iw4": "m4_mp", "iw5": "iw5_m4_mp", "iw6": "iw6_ak12_mp", "t5": "m16_mp"}
 
 
 def weapon_key(game, name):
@@ -72,7 +72,14 @@ CLIP_ROLES = {
     "adsRechamber": "adsRechamberAnim",
     "reloadStart": "reloadStartAnim",
     "reloadEnd": "reloadEndAnim",
+    "slideIn": "slideInAnim",
+    "slideLoop": "slideLoopAnim",
+    "slideOut": "slideOutAnim",
 }
+# Roles only some games have a clip slot for: Ghosts' knee slide, which no IW4, IW5
+# or Treyarch weapon file can name. Read and packed like any role, but kept out of
+# WEAPON_KEYS, because a game with no slide is not a weapon read in part.
+OPTIONAL_CLIP_ROLES = ("slideIn", "slideLoop", "slideOut")
 # What a round takes off, and how far it carries. `damage` **is** the maximum —
 # there is no `maxDamage` key — and it is the player-versus-player number: MW2's
 # M4 is 30 falling to 20, which is that game's published figure. `playerDamage`
@@ -169,7 +176,7 @@ WEAPON_KEYS = (
     "shotCount",
     "weaponType",
     "penetrateType",
-    *CLIP_ROLES.values(),
+    *(key for role, key in CLIP_ROLES.items() if role not in OPTIONAL_CLIP_ROLES),
     *DAMAGE.values(),
     *SPREAD.values(),
     *LOCATIONS.values(),
@@ -584,6 +591,17 @@ def check_fixed_bones(clip):
         raise ValueError(f"{clip.name} moves {', '.join(moved)}, which the viewmodel assumes fixed")
 
 
+def _view_clip_fault(clip, absolute_bones):
+    """Why a weapon GLB cannot carry `clip`, or None: its translations mean something else, or it moves a fixed bone."""
+    if absolute_bones is None and TRANSLATION_BY_ASSET_TYPE.get(clip.asset_type) != "absolute":
+        return f"{clip.name} is asset type {clip.asset_type}; every view clip measured is 1 (absolute translations)"
+    try:
+        check_fixed_bones(clip)
+    except ValueError as refused:
+        return str(refused)
+    return None
+
+
 def build_weapon_glb(gun_packed, hands_raw, out_path, game_key, weapon, info, clips, extra=(), absolute_bones=None):
     """Write the weapon GLB; return (its definition, the gun's joints, [clip problems]).
 
@@ -606,12 +624,17 @@ def build_weapon_glb(gun_packed, hands_raw, out_path, game_key, weapon, info, cl
 
     roles, missing = role_clips(info, clips)
     problems = [f"no clip {m} in the zone" for m in missing]
+    # No export has met a slide clip yet, so one this rig cannot take (a camera tilt
+    # on `tag_view`, an additive) costs the weapon its slide rather than the weapon.
+    for role in OPTIONAL_CLIP_ROLES:
+        if role in roles and (fault := _view_clip_fault(clips[roles[role]], absolute_bones)):
+            del roles[role]
+            problems.append(f"{role} left out: {fault}")
     used = set(roles.values()) | set(extra)
     for name in sorted(used):
         clip = clips[name]
-        if absolute_bones is None and TRANSLATION_BY_ASSET_TYPE.get(clip.asset_type) != "absolute":
-            raise ValueError(f"{name} is asset type {clip.asset_type}; every view clip measured is 1 (absolute translations)")
-        check_fixed_bones(clip)
+        if fault := _view_clip_fault(clip, absolute_bones):
+            raise ValueError(fault)
         written, unmatched = clip_to_gltf(gltf, buf, clip, absolute_bones)
         if not written:
             # A clip with no track at all is the game saying this weapon does not

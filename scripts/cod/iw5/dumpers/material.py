@@ -31,7 +31,7 @@ from .shaders import ZoneNames
 SEMANTICS = (
     "2D function colorMap detailMap unused2 normalMap unused3 unused4 specularMap unused5 unused6 waterMap displacementMap"
 ).split()
-SEMANTICS_BY_GAME = {"iw4": SEMANTICS[:-1], "iw5": SEMANTICS}  # IW4 has no TS_DISPLACEMENT_MAP
+SEMANTICS_BY_GAME = {"iw3": SEMANTICS[:-1], "iw4": SEMANTICS[:-1], "iw5": SEMANTICS}  # IW4 has no TS_DISPLACEMENT_MAP
 WATER_MAP = 11
 CAMERA_REGIONS = ("litOpaque", "litTrans", "emissive", "depthHack", "none")
 FILTERS = ("disabled", "nearest", "linear", "aniso2x", "aniso4x")

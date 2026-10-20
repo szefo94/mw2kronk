@@ -13,7 +13,7 @@ import pytest
 from scripts.cod import attachments, catalog
 from scripts.cod.s1.dumpers import attachment as attachment_dump
 from scripts.cod.s1.dumpers import weapon as weapon_dump
-from scripts.cod.viewmodel import CLIP_ROLES, parse_infostring
+from scripts.cod.viewmodel import CLIP_ROLES, OPTIONAL_CLIP_ROLES, parse_infostring
 
 # --- the enums --------------------------------------------------------------
 
@@ -43,7 +43,8 @@ def test_each_clip_role_reads_s1s_own_slot():
     """`vm_ak12_reload` is slot 24 and `vm_ak12_ads_up` 128 on every gun; IW6's numbers are 16 and 90."""
     assert weapon_dump.ANIMS["reloadAnim"] == 24 and weapon_dump.ANIMS["adsUpAnim"] == 128
     assert weapon_dump.ANIMS["raiseAnim"] == 36 and weapon_dump.ANIMS["sprintLoopAnim"] == 52
-    assert set(CLIP_ROLES.values()) <= set(weapon_dump.ANIMS)
+    # The slide is Ghosts'; which of S1's slots it is has not been established.
+    assert {key for role, key in CLIP_ROLES.items() if role not in OPTIONAL_CLIP_ROLES} <= set(weapon_dump.ANIMS)
     assert all(0 < slot < weapon_dump.NUM_ANIMS for slot in weapon_dump.ANIMS.values())
 
 

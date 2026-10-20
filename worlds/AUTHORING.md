@@ -1,5 +1,10 @@
 # Authoring `.world` files
 
+> **Exported worlds are not committed.** Every folder under `worlds/` (the imported maps and the shared `catalog/`) is
+> built from your own game files and gitignored; only this file is tracked. How and where to get the game files and rebuild
+> every export: Vibe on Duty 2's `docs/ASSETS-SETUP.md` (VibeOnDuty2Browser repo) and [docs/cod/README.md](../docs/cod/README.md).
+> One map at a time, always naming it: `.venv/bin/python -m scripts.cod export mp_rust --game mw2`.
+
 This is the complete reference for the world description language. Most of a
 world is **generated** — `python3 -m scripts.cod export` writes the geometry,
 props, spawns and lighting of an imported Call of Duty map — so what you

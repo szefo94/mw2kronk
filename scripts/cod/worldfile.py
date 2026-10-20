@@ -63,6 +63,7 @@ WS_KEYS_BY_GAME = {"iw6": WS_KEYS_IW6, "s1": WS_KEYS_S1}
 # spans 0.2 (a night map) to 10. Its ambient scale never multiplies anything:
 # no Ghosts ambient key is established.
 LIGHT_SCALE_BY_GAME = {
+    "iw3": (1.0, 1.0),
     "iw4": (1.0, 1.0),
     "iw5": (1.0, 1.0),
     "t5": (1.0 / 12.0, 1.0 / 4.0),
@@ -117,6 +118,7 @@ def bake(atlas):
 
 # The game a dump came from, keyed by the `_game` field OAT writes into every manifest.
 GAMES = {
+    "iw3": ("CoD4", "Call of Duty 4: Modern Warfare"),
     "iw4": ("MW2", "Modern Warfare 2"),
     "iw5": ("MW3", "Modern Warfare 3"),
     "t5": ("BO", "Black Ops"),
@@ -131,7 +133,7 @@ GAMES = {
 # peers as capsules -- which is what one with no catalogue does anyway -- so its
 # world file leaves the line out until the catalogue lands, and
 # `ensure_world_game` adds it then. test_worldfile_games.py pins this to the schema.
-DSL_GAMES = ("iw4", "iw5", "iw6", "t5", "t6", "s1")
+DSL_GAMES = ("iw3", "iw4", "iw5", "iw6", "t5", "t6", "s1")
 
 # Black Ops zombie zones share no prefix (zombie_theater, zombietron, nacht_der_untoten);
 # Black Ops II's all start `zm_` (zm_transit).

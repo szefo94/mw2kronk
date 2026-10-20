@@ -1597,7 +1597,17 @@ slots IW5 has no key for are the mantles (seven heights, up and over), the
 slides, the fast and multiple reloads, the recoil settle, the swim loop and a 30
 -clip additive set (walk, crawl, jump, drag) that layers over whatever is
 playing. Nothing is dumped under a name for them, because inventing key
-spellings is what a per-game key table is.
+spellings is what a per-game key table is — **except the slides**. Slots 55 to 57
+(`slide_in`, `slide_loop`, `slide_out`) are written as `slideInAnim`,
+`slideLoopAnim` and `slideOutAnim`, spelled after IW5's `sprint*Anim`, so a Ghosts
+weapon's GLB carries its knee slide under the roles `slideIn`/`slideLoop`/`slideOut`.
+No other game has a slot for them, so they are `viewmodel.OPTIONAL_CLIP_ROLES`:
+read like any role, but not among the keys every backend must write
+(`WEAPON_KEYS`). Nothing in the engine plays them yet. No export has met one yet,
+so a slide clip the rig cannot take (asset type other than 1, or one moving
+`tag_view`, as a camera tilt would) is left out and reported, and the weapon
+builds without its slide. The same fault on any other role still refuses the
+weapon.
 
 **A shell-at-a-time reload is two flags, not one.** IW6 declares both
 `bSegmentedReload` — IW5's, with `reloadStartAnim`/`reloadEndAnim`, set on the

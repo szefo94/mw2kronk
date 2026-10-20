@@ -24,7 +24,7 @@ from scripts.cod.iw6.zone import KIND_FLOAT, KIND_POINTER, KIND_SIGNED, KIND_UNS
 from scripts.cod.materials import classify_materials
 from scripts.cod.metadata import zone_listing
 from scripts.cod.shell import check_unit_vectors, decode_vertices, neutralise_generated, read_container, unpack_unit_vec
-from scripts.cod.viewmodel import LOCATIONS, WEAPON_KEYS
+from scripts.cod.viewmodel import CLIP_ROLES, LOCATIONS, OPTIONAL_CLIP_ROLES, WEAPON_KEYS
 
 
 def packed_iw6(x, y, z):
@@ -516,6 +516,11 @@ def test_a_clip_role_names_iw6s_slot_not_iw5s():
     assert weapon_dump.ANIMS["adsUpAnim"] == 90 and weapon_dump.ANIM_SLOTS[90] == "ads_up"
     # IW6 splits melee into four slots; `meleeAnim` is the swipe, which is what IW5's is.
     assert weapon_dump.ANIMS["meleeAnim"] == 9 and weapon_dump.ANIM_SLOTS[9] == "melee_swipe"
+    # The slide has no IW5 slot to borrow a number from, and it is written: the
+    # viewmodel export reads its three keys (viewmodel.OPTIONAL_CLIP_ROLES).
+    for key, slot in (("slideInAnim", "slide_in"), ("slideLoopAnim", "slide_loop"), ("slideOutAnim", "slide_out")):
+        assert weapon_dump.ANIM_SLOTS[weapon_dump.ANIMS[key]] == slot
+    assert {CLIP_ROLES[role] for role in OPTIONAL_CLIP_ROLES} <= weapon_dump.KEYS
     assert len(set(weapon_dump.ANIMS.values())) == len(weapon_dump.ANIMS)
     assert max(weapon_dump.ANIMS.values()) < len(weapon_dump.ANIM_SLOTS) == 124
 

@@ -21,7 +21,7 @@ METADATA_FILE = "export_metadata.json"
 IMAGES = {"loadscreen": "loadscreen.jpg", "minimap": "minimap.png"}  # `images`: each picture in assets/, when there
 
 # The zone listing's `>game,` header -> the `_game` key OAT writes into manifests.
-ZONE_GAMES = {"IW4": "iw4", "IW5": "iw5", "T5": "t5", "T6": "t6", "IW6": "iw6", "S1": "s1", "T9": "t9"}
+ZONE_GAMES = {"IW3": "iw3", "IW4": "iw4", "IW5": "iw5", "T5": "t5", "T6": "t6", "IW6": "iw6", "S1": "s1", "T9": "t9"}
 
 # Which modes a map ships, as the zone lists them: one asset per mode, named
 # after it. IW and T5 ship a config stringtable each; Ghosts ships none of those

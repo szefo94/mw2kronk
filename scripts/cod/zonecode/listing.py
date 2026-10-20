@@ -9,6 +9,7 @@ is another zone's asset, listed as it is found.
 import os
 
 HEADERS = {
+    "iw3": ("// Call Of Duty 4: Modern Warfare", "IW3"),
     "iw4": ("// Call Of Duty: Modern Warfare 2", "IW4"),
     "iw5": ("// Call Of Duty: Modern Warfare 3", "IW5"),
     "t5": ("// Call Of Duty: Black Ops", "T5"),
