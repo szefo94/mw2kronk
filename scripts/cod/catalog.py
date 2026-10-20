@@ -411,6 +411,18 @@ def build_one(work, worlds_root, game_key, weapon, info, hands_raw, iwi, states,
 # as `worldweapons/<game>/<model>/<model>.glb`, for a client that has no other copy of
 # it. CoD4 alone so far: a player who sees another hold a CoD4 gun needs CoD4's.
 WORLD_MODEL_GAMES = {"iw3"}
+# Games whose attachment variants may be another gun model (build_from_zone).
+OWN_MODEL_VARIANT_GAMES = {"iw3"}
+
+
+def _base_of(name, bases):
+    """The base weapon a variant's name starts with (`mp5_silencer_mp` -> `mp5_mp`), or None."""
+    stem = name.removesuffix("_mp").split("_")
+    for n in range(len(stem) - 1, 0, -1):
+        cand = "_".join(stem[:n]) + "_mp"
+        if cand in bases:
+            return cand
+    return None
 WORLD_TEXTURE_SIZE = 512
 
 
@@ -645,8 +657,24 @@ def build_from_zone(work, worlds_root, game_key, states, hands=None):
         fits = f"{len(entry['attachments']):2} att" if entry["attachments"] else "      "
         print(f"  + {entry['slot'][:4]} {entry['class']:15} {name:24} {size / 1e6:5.1f} MB {fits}{note}")
 
+    if game_key in OWN_MODEL_VARIANT_GAMES:
+        # CoD4 draws a silencer as another gun model with its own clips (viewmodel_mp5_silencer_mp,
+        # viewmodel_mp5_sd_*), not as a tag on the base one: such a variant is catalogued whole too.
+        for name, info in guns.items():
+            base = bases.get(_base_of(name, bases))
+            if name in bases or base is None or info.get("gunModel") in (None, base.get("gunModel")):
+                continue
+            built, problems = build_one(work, worlds_root, game_key, name, info, hands_raw, iwi, states, scratch)
+            if built is None:
+                skipped.append((name, problems))
+                continue
+            entry, size = built
+            entry["variantOf"] = _base_of(name, bases)
+            entries.append(entry)
+            total += size
+            print(f"  + {entry['slot'][:4]} {entry['class']:15} {name:24} {size / 1e6:5.1f} MB  variant, own model")
     if game_key in WORLD_MODEL_GAMES:
-        print(f"  {_world_models(work, worlds_root, game_key, entries, bases, iwi, states)} world model(s)")
+        print(f"  {_world_models(work, worlds_root, game_key, entries, guns, iwi, states)} world model(s)")
 
     overlays = _overlay_images(work, worlds_root, game_key, entries)
     if overlays:
