@@ -423,6 +423,8 @@ def _base_of(name, bases):
         if cand in bases:
             return cand
     return None
+
+
 WORLD_TEXTURE_SIZE = 512
 
 
