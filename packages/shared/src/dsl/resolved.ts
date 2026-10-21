@@ -125,6 +125,10 @@ export interface ResolvedTrigger {
   modes?: readonly string[];
   /** Usable, and how it is reached. Undefined: occupancy only. */
   use?: UseMode;
+  /** An objective's letter, its place in a rotation and its side, as the map says them (`ObjectiveRoles`). */
+  label?: string;
+  index?: number;
+  team?: string;
   position: Vec3;
   /** Radians. */
   yaw: number;
@@ -150,6 +154,9 @@ export interface ResolvedPoint {
   look: Vec3;
   target?: string;
   modes?: readonly string[];
+  label?: string;
+  index?: number;
+  team?: string;
 }
 
 /**

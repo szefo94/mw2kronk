@@ -44,6 +44,23 @@ def test_black_ops_tags_a_wager_barrier_with_exactly_the_four_wager_modes():
     assert modes_of("t5", ent("hq"), FACTS) == ["koth"]
 
 
+def test_black_ops_ii_tells_hardpoint_from_headquarters():
+    """BO2's `koth` is Hardpoint and `hq` Headquarters, the game's own names."""
+    assert modes_of("t6", ent("koth"), FACTS) == ["koth"]
+    assert modes_of("t6", ent("hq"), FACTS) == ["hq"]
+    assert modes_of("t6", ent("ctf"), FACTS) == ["ctf", "oneflag"]
+    assert modes_of("t6", ent("dom"), FACTS) == ["dom", "oneflag"]
+    assert modes_of("t6", ent("[all_modes]"), FACTS) is None
+
+
+def test_black_ops_ii_demolition_has_its_own_sites_and_falls_back_to_sd_s():
+    """Raid's `bombzone_dem` triggers are Demolition's, its `bombzone` ones Search and Destroy's."""
+    raid = MapFacts(map="mp_raid", targetnames=frozenset({"bombzone", "bombzone_dem"}))
+    assert modes_of("t6", ent("bombzone_dem"), raid) == ["dem"]
+    assert modes_of("t6", ent("bombzone"), raid) == ["sd"]
+    assert modes_of("t6", ent("bombzone"), FACTS) == ["dem", "sd"]
+
+
 def test_ghosts_has_no_list_so_anything_carrying_the_key_stays(capsys):
     assert modes_of("iw6", ent("dom"), MapFacts(map="mp_x")) is None
     assert "'dom' is in no iw6 gametype's list" in capsys.readouterr().out
@@ -110,7 +127,7 @@ def test_a_placed_brush_model_carries_its_entity_and_its_modes(tmp_path):
     assert preflight(gfxworld, clip, True, str(ents))[1]["modes"] is None
 
 
-@pytest.mark.parametrize("game", ["iw4", "iw5", "s1", "t5"])
+@pytest.mark.parametrize("game", ["iw4", "iw5", "s1", "t5", "t6"])
 def test_every_mode_key_is_the_games_own_name_bar_war(game):
     keys = set(allowed_names(game, FACTS))
     assert "war" not in keys and "tdm" in keys

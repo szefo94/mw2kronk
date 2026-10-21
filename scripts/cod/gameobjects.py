@@ -20,7 +20,7 @@ KEY = "script_gameobjectname"
 
 # IW's `main` appends this to every gametype's list, so what carries it is in every mode.
 IW_ALWAYS = "airdrop_pallet"
-# T5's `entity_is_allowed` keeps an entity whose whole value is this string, in every mode.
+# T5's and T6's `entity_is_allowed` keep an entity whose whole value is this string, in every mode.
 T5_ALL_MODES = "[all_modes]"
 
 # {mode key: names its gametype allows}, read from each gametype's `onStartGameType`.
@@ -63,6 +63,29 @@ T5_ALLOWED = {
     "sur": ("sur",),
 }
 
+# Black Ops II, from patch_mp.ff's compiled gametypes: the strings each `onstartgametype`
+# pushes before it calls `_gameobjects::main` (scripts/cod/t6/gsc.py). The mode keys are
+# BO2's own gametype names, so here `koth` is Hardpoint and `hq` Headquarters (on Black
+# Ops `koth` is Headquarters). `conf` allows `level.gametype`. Demolition allows
+# `level.dembombzonename`: `bombzone_dem`, or `bombzone` on a map with no entity of
+# that targetname, as on Black Ops (`_allowed_t6`).
+T6_ALLOWED = {
+    "tdm": ("tdm",),
+    "dm": ("dm",),
+    "dom": ("dom",),
+    "koth": ("koth",),
+    "hq": ("hq",),
+    "sd": ("sd", "bombzone", "blocker"),
+    "dem": ("sd", "bombzone_dem", "blocker", "dem"),
+    "ctf": ("ctf",),
+    "oneflag": ("ctf", "dom"),
+    "conf": ("conf",),
+    "gun": ("gun",),
+    "oic": ("oic",),
+    "shrp": ("shrp",),
+    "sas": ("sas",),
+}
+
 # Ghosts: no entity in any of its zones carries the key, so there is nothing to allow.
 # Cold War's gametype scripts are not read, so, as on Ghosts, no entity is restricted to a mode.
 ALLOWED_BY_GAME = {
@@ -71,7 +94,7 @@ ALLOWED_BY_GAME = {
     "iw5": IW5_ALLOWED,
     "s1": S1_ALLOWED,
     "t5": T5_ALLOWED,
-    "t6": {},
+    "t6": T6_ALLOWED,
     "iw6": {},
     "t9": {},
 }
@@ -114,10 +137,19 @@ def _allowed_t5(facts):
     return allowed
 
 
+def _allowed_t6(facts):
+    allowed = dict(T6_ALLOWED)
+    if "bombzone_dem" not in facts.targetnames:  # dem.gsc: level.dembombzonename
+        allowed["dem"] = ("sd", "bombzone", "blocker", "dem")
+    return allowed
+
+
 def allowed_names(game, facts):
     """{mode key: names allowed} for one map of `game`, its conditions applied."""
     if game == "t5":
         return _allowed_t5(facts)
+    if game == "t6":
+        return _allowed_t6(facts)
     if game not in ALLOWED_BY_GAME:
         raise ValueError(f"no game-object table for game {game!r}")
     return ALLOWED_BY_GAME[game]
@@ -140,7 +172,7 @@ def modes_of(game, entity, facts):
     value = entity.get(KEY)
     if value is None:
         return None
-    if game == "t5" and value == T5_ALL_MODES:
+    if game in ("t5", "t6") and value == T5_ALL_MODES:
         return None
     names = value.split()
     if game in ("iw3", "iw4", "iw5", "s1") and IW_ALWAYS in names:

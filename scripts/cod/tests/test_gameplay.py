@@ -83,10 +83,38 @@ def test_triggers_are_named_by_entity_id_so_a_shared_targetname_stays_distinct()
     assert lines[1].startswith("trigger t18 {")
 
 
-def test_a_trigger_with_no_volume_to_read_is_counted_not_guessed_at():
-    """IW's `?N` is the entity lump's own trigger table, which nothing dumps: a made-up size would be worse."""
+def test_a_trigger_table_volume_is_left_to_volumes_world():
+    """IW's `?N` is the entity lump's own trigger table, which the mapents dumper writes beside the lump."""
     lines, volumes, skipped = _trigger_lines([{"id": 1, "classname": "trigger_use_touch", "at": [0, 0, 0], "model": "?0"}])
+    assert (lines, volumes, skipped) == ([], 1, 0)
+
+
+def test_a_trigger_with_no_volume_to_read_is_counted_not_guessed_at():
+    """A trigger with neither a model nor a radius: a made-up size would be worse."""
+    lines, volumes, skipped = _trigger_lines([{"id": 1, "classname": "trigger_multiple", "at": [0, 0, 0]}])
     assert (lines, volumes, skipped) == ([], 0, 1)
+
+
+def test_a_trigger_carries_its_label_index_and_team():
+    """A bomb site's letter, a Hardpoint zone's order and a flag's side, as properties: no entity-id join."""
+    ent = {
+        "id": 7,
+        "classname": "trigger_radius",
+        "at": [0, 0, 0],
+        "radius": "64",
+        "targetname": "koth_zone",
+        "script_label": "_a",
+        "script_index": "3",
+        "script_team": "allies",
+    }
+    (line,), _, _ = _trigger_lines([ent])
+    assert line.endswith('label: "_a", index: 3, team: "allies" }')
+
+
+def test_an_index_that_is_not_a_number_is_left_out():
+    ent = {"id": 7, "classname": "trigger_radius", "at": [0, 0, 0], "radius": "64", "script_index": "first"}
+    (line,), _, _ = _trigger_lines([ent])
+    assert "index:" not in line
 
 
 def test_a_brush_volume_trigger_is_left_to_volumes_world():

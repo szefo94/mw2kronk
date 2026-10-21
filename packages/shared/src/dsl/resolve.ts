@@ -16,7 +16,23 @@ import { isObjectNode } from "./ast.js";
 import type { Diagnostic } from "./diagnostics.js";
 import { didYouMean, error, hasErrors, warning } from "./diagnostics.js";
 import { validateStatements } from "./schema.js";
-import { addVec, boolOf, colorOf, enumOf, findProp, modesOf, numbersOf, refOf, rotateY, rotationOf, stringOf, stringsOf, vec3, vecOf } from "./resolveUtil.js";
+import {
+  addVec,
+  boolOf,
+  colorOf,
+  enumOf,
+  findProp,
+  modesOf,
+  numbersOf,
+  refOf,
+  rolesOf,
+  rotateY,
+  rotationOf,
+  stringOf,
+  stringsOf,
+  vec3,
+  vecOf,
+} from "./resolveUtil.js";
 import { toMeters, toRadians } from "./units.js";
 import { UNASSIGNED_ENTITY_ID } from "./resolved.js";
 import type {
@@ -477,6 +493,7 @@ class ResolveContext {
         target: this.targetOf(stmt),
         modes: modesOf(findProp(stmt, "mode")),
         use: enumOf(findProp(stmt, "use")) as UseMode | undefined,
+        ...rolesOf(stmt),
         position,
         yaw: rotation.y,
         size: sizeProp ? vecOf(sizeProp, toMeters) : undefined,
@@ -606,6 +623,7 @@ class ResolveContext {
         look: lookProp ? vecOf(lookProp, toMeters) : addVec(position, vec3(0, 0, -1)),
         target: this.targetOf(node),
         modes: modesOf(findProp(node, "mode")),
+        ...rolesOf(node),
       };
     });
   }

@@ -97,6 +97,24 @@ export function modesOf(prop: PropertyNode | undefined): string[] | undefined {
   return prop ? stringsOf(prop) : undefined;
 }
 
+/** An objective's `label`, `index` and `team`, holding only the ones the node declares. */
+export function rolesOf(node: ObjectNode): { label?: string; index?: number; team?: string } {
+  const out: { label?: string; index?: number; team?: string } = {};
+  const label = stringOf(findProp(node, "label"));
+  const index = numbersOf(findProp(node, "index"), (v) => v)[0];
+  const team = stringOf(findProp(node, "team"));
+  if (label !== undefined) {
+    out.label = label;
+  }
+  if (index !== undefined) {
+    out.index = index;
+  }
+  if (team !== undefined) {
+    out.team = team;
+  }
+  return out;
+}
+
 /** With no `fallback`, an absent property reads as undefined: an enum that is genuinely optional. */
 export function enumOf(prop: PropertyNode | undefined): string | undefined;
 export function enumOf(prop: PropertyNode | undefined, fallback: string): string;

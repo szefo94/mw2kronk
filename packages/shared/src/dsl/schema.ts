@@ -160,6 +160,12 @@ export const PROPERTY_KINDS: Record<string, PropertyKind> = {
   // is every mode; a wager barrier exists in four.
   mode: { valueKind: "string", minArity: 1, maxArity: 32 },
   team: { valueKind: "string", minArity: 1, maxArity: 1 },
+  // `trigger` and `point`: an objective's role, as the map's own entity says it
+  // (`script_label`, `script_index`; `team` is `script_team`): a bomb site's or a
+  // flag's letter (`_a`, `A`), and a zone's place in a rotation. What either
+  // means is the gametype's, as `tag` is.
+  label: { valueKind: "string", minArity: 1, maxArity: 1 },
+  index: { valueKind: "number", unit: "none", minArity: 1, maxArity: 1 },
   start: { valueKind: "bool", minArity: 1, maxArity: 1 },
 
   // `trigger`: a sphere's reach, as an alternative to a box's `size`.
@@ -342,12 +348,12 @@ export const NODE_TYPES: Record<string, NodeTypeSpec> = {
 
   // A volume something can be inside. It draws nothing; what a trigger *does*
   // is not in the world file, which only says where it is and what to call it.
-  trigger: { type: "trigger", nameMode: "optional-free", properties: ["at", "size", "radius", "height", "rotate", "tag", "target", "mode", "use"], children: "none", sizeArity: [3, 3] },
+  trigger: { type: "trigger", nameMode: "optional-free", properties: ["at", "size", "radius", "height", "rotate", "tag", "target", "mode", "use", "label", "index", "team"], children: "none", sizeArity: [3, 3] },
 
   // A tagged position with a facing, for whatever a script wants one for: where a
   // creature appears, where a player is sent. `spawn`'s shape, but a spawn is the
   // engine's and a point is a script's. Top level only, so `look` is world space.
-  point: { type: "point", nameMode: "optional-free", properties: ["at", "look", "tag", "target", "mode"], children: "none", atArity: [3, 3], required: ["at"] },
+  point: { type: "point", nameMode: "optional-free", properties: ["at", "look", "tag", "target", "mode", "label", "index", "team"], children: "none", atArity: [3, 3], required: ["at"] },
 
   // A piece of the world's `collision` glb that can be absent: outside its
   // `mode`s, or once a script removes it. A part no `solid` names is always there.

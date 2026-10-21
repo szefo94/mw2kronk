@@ -549,12 +549,15 @@ def export_climbing(map_name, out, clip_path, placements):
 def export_volumes(map_name, out, clip, ents_path, game_key, facts=None):
     """Stage 6's `volumes.world`: every brush-volume trigger and zone, a box per brush. Returns whether it was written.
 
-    From the clipmap, so `--gameplay-only` cannot rewrite it; tagged and linked
-    by the entity lump exactly as `gameplay.world` is (scripts/cod/gameplay.py).
+    From the clipmap and, for IW4/IW5's `?N` triggers, the entity lump's trigger
+    table dumped beside `ents_path` (scripts/cod/triggers.py), so `--gameplay-only`
+    cannot rewrite it; tagged and linked by the entity lump exactly as
+    `gameplay.world` is (scripts/cod/gameplay.py).
     """
     entities = metadata.read_entities(ents_path, game_key) if os.path.exists(ents_path) else []
     modes_of = gameplay.modes_function(game_key, map_name, entities, facts)
-    found, stats, targets = triggers.read_triggers(clip, entities, modes_of)
+    table = triggers.read_table(ents_path) if os.path.exists(ents_path) else None
+    found, stats, targets = triggers.read_triggers(clip, entities, modes_of, table)
     triggers.report(found, stats, targets)
     return worldfile.write_volumes_world(out, map_name, found) is not None
 
