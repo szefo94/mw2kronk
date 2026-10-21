@@ -769,6 +769,22 @@ sites. The unnamed script whose first strings are `airdrop_pallet`,
 `tjugg`, `grnd`, `tdef`, `gun`, `oic`) name no gameobject there and are not
 tabled; no MW3 entity names them.
 
+**Black Ops II, from its compiled scripts** (`patch_mp.ff`). Each gametype's
+`onstartgametype` pushes the names it allows right before it calls
+`_gameobjects::main`, which `t6/gsc.py` reads off the string and call tables.
+`entity_is_allowed` keeps `[all_modes]` as Black Ops' does. Here `koth` is
+Hardpoint and `hq` Headquarters, the game's own names.
+
+| Mode key                         | Allowed names                          | Note                                                                        |
+| -------------------------------- | -------------------------------------- | --------------------------------------------------------------------------- |
+| `tdm`                            | `tdm`                                  |                                                                             |
+| `dm`, `dom`, `ctf`, `koth`, `hq` | the name itself                        |                                                                             |
+| `sd`                             | `sd`, `bombzone`, `blocker`            |                                                                             |
+| `dem`                            | `sd`, `bombzone_dem`, `blocker`, `dem` | `bombzone` in place of `bombzone_dem` on a map without one, as on Black Ops |
+| `oneflag`                        | `ctf`, `dom`                           |                                                                             |
+| `conf`                           | `conf`                                 | `level.gametype`                                                            |
+| `gun`, `oic`, `shrp`, `sas`      | the name itself                        |                                                                             |
+
 **Advanced Warfare** is read as MW3, not yet checked against its scripts, plus
 `hp` and `horde`, each allowing its own name. **Ghosts**: no entity in its zones
 carries the key.

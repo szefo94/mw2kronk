@@ -437,10 +437,15 @@ origin. `triggers.py` writes each **brush** as one yaw-aligned `trigger` box
 that turns a corner, and one per brush stays within 1.42× of the brushes on both
 zombies maps ([reference.md](reference.md#zombies-entities)). A box is named
 `t<entity id>`, with `_<k>` for each brush of a model of several. It carries
-`tag`, `target`, `mode` and `use` exactly as `gameplay.world`'s nodes do, and the
-log prints the box fit and every target it dropped. IW4 and IW5 name a trigger's
-volume `?N`, an index into the entity lump's own trigger table, which no backend
-dumps; those are counted in `gameplay.world` and not exported.
+`tag`, `target`, `mode`, `use` and the objective's `label`, `index` and `team`
+exactly as `gameplay.world`'s nodes do, and the log prints the box fit and every
+target it dropped. IW4 and IW5 name a trigger's volume `?N`, an index into the
+entity lump's own trigger table (`MapEnts.trigger`), which the mapents dumper
+writes beside the lump as `<map>.triggers.json`: model N is a run of hulls, each
+an AABB cut by a run of slabs (two parallel planes), stored around the entity's
+origin. Each **hull** becomes one box, as a brush does, so MW2's bomb sites, bomb
+pickups, Sabotage sites and HQ radio triggers are in `volumes.world` too (on
+mp_rust site A is 3.66 × 2.10 × 3.29 m, B 4.06 × 2.03 × 3.25 m).
 
 `--volumes-only` rewrites just `volumes.world` from a fresh dump of the entities
 and the clipmap, and adds its include if it is missing. A target in it may name a
@@ -581,8 +586,15 @@ the log and the file's header count them by what they named.
 
 **Brush-volume triggers are `volumes.world`'s.** Only `trigger_radius` carries its
 own size; a `*N` volume is in the clipmap, which this stage does not read, so
-`gameplay.world` counts those in its header and stage 6 writes them. IW's `?N`
-triggers are counted as not exported.
+`gameplay.world` counts those in its header and stage 6 writes them; IW's `?N`
+triggers are counted the same way, since stage 6 writes them from the trigger
+table.
+
+**Objective roles.** A trigger or point also carries `label`, `index` and `team`
+from the entity's `script_label`, `script_index` and `script_team`
+(`gameplay.roles_of`): a bomb site's or flag's letter, a Hardpoint zone's order,
+a flag base's side. `index` is written as a number, or left out when it is not
+one.
 
 ### Navigation
 

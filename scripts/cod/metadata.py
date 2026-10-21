@@ -336,6 +336,8 @@ def _brief(e):
         "classname",
         "targetname",
         "script_label",
+        "script_index",
+        "script_team",
         "script_gameobjectname",
         "model",
         "radius",

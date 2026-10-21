@@ -24,6 +24,12 @@ MAX_TAGS = 8
 #: group, its kind, and a qualifier (a zombie spawner's riser or chaser).
 TAG_KEYS = ("targetname", "script_noteworthy", "script_string")
 
+#: The keys a gametype script reads an objective's role off, and the DSL property
+#: each becomes: a bomb site's or flag's letter (`_a`, `A`), a Hardpoint zone's
+#: place in the rotation, and the side that owns it (a CTF flag base). As they
+#: are, so a game needs no join back to the entity lump to tell site A from B.
+ROLE_KEYS = (("script_label", "label"), ("script_index", "index"), ("script_team", "team"))
+
 #: How a usable trigger is reached, by class (reverse/t5-zombies/README.md#4-the-use-rule).
 USE_BY_CLASS = {"trigger_use": "near", "trigger_use_touch": "touch"}
 
@@ -34,6 +40,8 @@ RADIUS_TRIGGERS = ("trigger_radius",)
 POINT_CLASSES = ("script_struct", "script_origin")
 
 _BRUSH_MODEL = re.compile(r"\*\d+")
+# IW4/IW5's own trigger volumes: `?N`, an index into the entity lump's trigger table.
+_VOLUME_MODEL = re.compile(r"[*?]\d+")
 
 
 def quote(value):
@@ -56,6 +64,30 @@ def tags_of(entity):
     return out[:MAX_TAGS]
 
 
+def roles_of(entity):
+    """{"label": str, "index": number, "team": str} for the `ROLE_KEYS` the entity carries.
+
+    `index` is a number when it reads as one (an integer stays an integer), and
+    is left out otherwise; the two strings are kept as the map spells them.
+    """
+    out = {}
+    for key, prop in ROLE_KEYS:
+        value = (entity.get(key) or "").strip()
+        if not value:
+            continue
+        if prop == "index":
+            try:
+                number = float(value)
+            except ValueError:
+                continue
+            if not math.isfinite(number):
+                continue
+            out[prop] = int(number) if number.is_integer() else number
+        else:
+            out[prop] = value
+    return out
+
+
 def is_volume_class(cls):
     return cls == "info_volume" or cls.startswith("trigger")
 
@@ -65,11 +97,15 @@ def is_radius_trigger(entity):
 
 
 def is_brush_volume(entity):
-    """A trigger or `info_volume` whose volume is brush model `*N`: one box per brush, in volumes.world."""
+    """A trigger or `info_volume` whose volume is a model: one box per brush or hull, in volumes.world.
+
+    The model is a clipmap brush model `*N`, or on IW4 and IW5 an entry `?N` of
+    the entity lump's trigger table (scripts/cod/triggers.py).
+    """
     return (
         is_volume_class(entity.get("classname", ""))
         and not is_radius_trigger(entity)
-        and bool(_BRUSH_MODEL.fullmatch(str(entity.get("model", ""))))
+        and bool(_VOLUME_MODEL.fullmatch(str(entity.get("model", ""))))
         and "at" in entity
     )
 

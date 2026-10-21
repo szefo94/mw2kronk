@@ -290,3 +290,107 @@ def test_look_with_no_angles_faces_cod_x():
     assert gameplay.look_at({"at": [1.0, 2.0, 3.0]}) == [2.0, 2.0, 3.0]
     assert gameplay.look_at({"at": [0.0, 0.0, 0.0], "angles": "90 0 0"}) == pytest.approx([0.0, -1.0, 0.0], abs=1e-3)
     assert math.isfinite(gameplay.look_at({"at": [0.0, 0.0, 0.0], "angles": "bad"})[0])
+
+
+# -- IW4/IW5's trigger table (`?N`) ------------------------------------------------------------------
+
+
+def rust_table():
+    """mp_rust's bomb site A (`?0`: one plain hull) and its bomb pickup (`?1`: a hull cut to an octagon).
+
+    Numbers as the mapents dumper writes them from the zone: the hull bounds and
+    slabs are around the entity's origin, as a brush model's brushes are.
+    """
+    d = math.sqrt(0.5)
+    return {
+        "models": [
+            {"contents": 0, "hullCount": 1, "firstHull": 0},
+            {"contents": 0, "hullCount": 1, "firstHull": 1},
+        ],
+        "hulls": [
+            {
+                "bounds": {"midPoint": {"x": -0.1, "y": -0.4, "z": 32.4}, "halfSize": {"x": 72.0, "y": 64.8, "z": 41.3}},
+                "contents": 0,
+                "slabCount": 0,
+                "firstSlab": 0,
+            },
+            {
+                "bounds": {"midPoint": {"x": 0.0, "y": 0.0, "z": 14.0}, "halfSize": {"x": 32.0, "y": 32.0, "z": 18.0}},
+                "contents": 0,
+                "slabCount": 2,
+                "firstSlab": 0,
+            },
+        ],
+        "slabs": [
+            {"dir": [d, d, 0.0], "midPoint": 0.0, "halfSize": 31.0},
+            {"dir": [d, -d, 0.0], "midPoint": 0.0, "halfSize": 31.0},
+        ],
+    }
+
+
+def rust_entities():
+    return [
+        {
+            "id": 103,
+            "classname": "trigger_use_touch",
+            "model": "?0",
+            "origin": "349 1467 -228",
+            "at": at_of((349, 1467, -228)),
+            "targetname": "bombzone",
+            "script_gameobjectname": "bombzone",
+            "script_label": "_a",
+        },
+        {
+            "id": 109,
+            "classname": "trigger_multiple",
+            "model": "?1",
+            "origin": "53 184 -248",
+            "at": at_of((53, 184, -248)),
+            "targetname": "sd_bomb_pickup_trig",
+        },
+    ]
+
+
+def test_a_trigger_table_hull_becomes_a_box_around_the_entity_origin():
+    """Bomb site A on Rust: 144 x 82.6 x 129.6 inches, centred 32.4 inches above the trigger's origin."""
+    found, stats, _ = read_triggers({}, rust_entities(), lambda e: None, rust_table())
+    site = by_name(found)["t103"]
+    assert site["size"] == pytest.approx((144 / UNITS_PER_M, 82.6 / UNITS_PER_M, 129.6 / UNITS_PER_M), abs=2e-3)
+    assert site["at"] == pytest.approx(to_engine((349 - 0.1, 1467 - 0.4, -228 + 32.4)), abs=2e-3)
+    assert site["yaw"] == 0 and site["use"] == "touch" and site["tags"] == ["bombzone"]
+    assert site["roles"] == {"label": "_a"}
+    assert (stats["exported"], stats["from the trigger table"]) == (2, 2)
+
+
+def test_slabs_cut_a_hull_like_a_brush_bevel():
+    """The pickup's two diagonal slabs make an octagon: the box still holds it, but the fill is under one."""
+    pickup = by_name(read_triggers({}, rust_entities(), lambda e: None, rust_table())[0])["t109"]
+    assert pickup["fill"] < 0.95
+    assert pickup["size"][1] == pytest.approx(36 / UNITS_PER_M, abs=2e-3)
+
+
+def test_without_a_trigger_table_a_question_mark_model_is_skipped_and_counted():
+    found, stats, _ = read_triggers({}, rust_entities(), lambda e: None)
+    assert found == []
+    assert stats["skipped: ?N with no trigger table dumped"] == 2
+
+
+def test_a_model_past_the_table_is_skipped():
+    ents = [{**rust_entities()[0], "model": "?9"}]
+    found, stats, _ = read_triggers({}, ents, lambda e: None, rust_table())
+    assert found == [] and stats["skipped: ?N past the trigger table"] == 1
+
+
+def test_volumes_world_writes_label_index_and_team(tmp_path):
+    ents = [{**rust_entities()[0], "script_index": "2", "script_team": "axis"}]
+    found, _, _ = read_triggers({}, ents, lambda e: None, rust_table())
+    body = open(write_volumes_world(str(tmp_path), "mp_rust", found)).read()
+    (line,) = [line for line in body.splitlines() if line.startswith("trigger t103 ")]
+    assert line.endswith('use: touch, label: "_a", index: 2, team: "axis" }')
+
+
+def test_roles_read_an_index_as_a_number_and_keep_strings_as_spelled():
+    assert gameplay.roles_of({"script_label": " A ", "script_index": "1"}) == {"label": "A", "index": 1}
+    assert gameplay.roles_of({"script_index": "1.5"}) == {"index": 1.5}
+    assert gameplay.roles_of({"script_index": "nan"}) == {}
+    assert gameplay.roles_of({}) == {}

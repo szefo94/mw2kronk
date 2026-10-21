@@ -624,6 +624,9 @@ refer to it.
 | `target` | string — a tag this trigger points at, see [Targets](#targets)       | —             |
 | `mode`   | 1 or more strings — the game modes it exists in, see [Modes](#modes) | every mode    |
 | `use`    | `near` or `touch` — it can be used, and how it is reached            | —             |
+| `label`  | string — an objective's letter, see [Objective roles](#objective-roles) | —          |
+| `index`  | number — its place in a rotation, see [Objective roles](#objective-roles) | —        |
+| `team`   | string — the side that owns it, see [Objective roles](#objective-roles) | —          |
 
 Give **either** `size` (a box) **or** `radius` (a sphere); both, or neither, is
 an error. A trigger inside a `group` takes that group's origin and rotation like
@@ -655,6 +658,20 @@ trigger { at: 4 0 -2, size: 6 3 4, tag: "balcony_zone" }
 trigger { at: 9 0 -6, size: 3 3 8, tag: "balcony_zone" }
 ```
 
+#### Objective roles
+
+**`label`**, **`index`** and **`team`** say which objective of a kind a trigger
+or point is: bomb site A or B (`label: "_a"`), a Hardpoint zone's place in the
+rotation (`index: 2`), the side a flag base belongs to (`team: "allies"`). The
+exporter copies them from the map's own `script_label`, `script_index` and
+`script_team`, spelled as the map spells them, so a game reads them off the node
+rather than joining back to the entity lump. Like `tag`, what they mean is the
+game's.
+
+```
+trigger { at: 8.862 -4.968 -37.252, size: 3.658 2.096 3.291, tag: "bombzone", mode: "dd" "sd", use: touch, label: "_a" }
+```
+
 ### `point <name>` (top level; optional name)
 
 A tagged position with a facing, for whatever the game's script wants one for:
@@ -669,6 +686,7 @@ the script's. It draws nothing.
 | `tag`    | 1–8 strings — shared group handles                           | —                       |
 | `target` | string — a tag this point points at, see [Targets](#targets) | —                       |
 | `mode`   | 1 or more strings — the game modes it exists in              | every mode              |
+| `label`, `index`, `team` | as a trigger's, see [Objective roles](#objective-roles) | —               |
 
 A point sits at the top level only, so `at` and `look` are world positions.
 

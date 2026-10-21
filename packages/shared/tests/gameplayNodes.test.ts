@@ -127,6 +127,19 @@ describe("triggers", () => {
     expect(trigger!.radius).toBeUndefined();
   });
 
+  it("carries an objective's label, index and team, and leaves them out when not declared", () => {
+    const world = resolveOk(`
+      trigger site { at: 0 0 0, size: 3.66 2.1 3.29, tag: "bombzone", label: "_a" }
+      trigger zone { at: 5 0 0, size: 1 1 1, label: "B", index: 2, team: "allies" }
+      point base { at: 9 0 0, tag: "ctf_flag", team: "axis" }
+    `);
+    expect(world.triggers[0]!.label).toBe("_a");
+    expect(world.triggers[0]!.index).toBeUndefined();
+    expect(world.triggers[1]).toMatchObject({ label: "B", index: 2, team: "allies" });
+    expect(world.points[0]!.team).toBe("axis");
+    expect("label" in world.points[0]!).toBe(false);
+  });
+
   it("resolves a sphere trigger, and a cylinder when given a height", () => {
     const world = resolveOk(`
       trigger ball { at: 0 0 0, radius: 5 }
